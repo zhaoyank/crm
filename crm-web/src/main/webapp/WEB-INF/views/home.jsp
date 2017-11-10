@@ -9,7 +9,7 @@
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     
-    <%@include file="inlcude/css.jsp"%>
+    <%@include file="include/css.jsp"%>
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -23,11 +23,11 @@
 <div class="wrapper">
 
     <!-- 顶部导航栏部分 -->
-    <%@include file="inlcude/header.jsp"%>
+    <%@include file="include/header.jsp"%>
 
     <!-- =============================================== -->
 
-    <jsp:include page="inlcude/left-side.jsp">
+    <jsp:include page="include/left-side.jsp">
         <jsp:param name="menu" value="home"/>
     </jsp:include>
 
@@ -82,11 +82,11 @@
     <!-- /.content-wrapper -->
 
     <!-- 底部 -->
-    <%@include file="inlcude/footer.jsp"%>
+    <%@include file="include/footer.jsp"%>
 
 </div>
 <!-- ./wrapper -->
 
-<%@include file="inlcude/js.jsp"%>
+<%@include file="include/js.jsp"%>
 </body>
 </html>

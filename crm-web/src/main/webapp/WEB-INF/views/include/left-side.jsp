@@ -10,7 +10,7 @@
             <li class="${param.menu == "home" ? "active" : ""}"><a href="/home"><i class="fa fa-home"></i>
                 <span>首页</span></a></li>
             <!-- 客户管理 -->
-            <li class="treeview">
+            <li class="treeview ${param.menu == "customer" ? "active" : ""}">
                 <a href="#">
                     <i class="fa fa-address-book-o"></i> <span>客户管理</span>
                     <span class="pull-right-container">

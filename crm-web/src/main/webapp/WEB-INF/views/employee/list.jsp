@@ -10,7 +10,8 @@
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     
-    <%@include file="../inlcude/css.jsp"%>
+    <%@include file="../include/css.jsp"%>
+    <link rel="stylesheet" href="/static/plugins/tree/css/metroStyle/metroStyle.css">
     <link rel="stylesheet" href="/static/plugins/datatables/jquery.dataTables.css">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -24,12 +25,12 @@
 <!-- Site wrapper -->
 <div class="wrapper">
 
-    <%@include file="../inlcude/header.jsp"%>
+    <%@include file="../include/header.jsp"%>
 
     <!-- =============================================== -->
 
     <!-- 左侧菜单栏 -->
-    <jsp:include page="../inlcude/left-side.jsp">
+    <jsp:include page="../include/left-side.jsp">
         <jsp:param name="menu" value="employee"/>
     </jsp:include>
 
@@ -130,15 +131,14 @@
    <!--  /模态框-->
 
     <!-- 底部 -->
-    <%@include file="../inlcude/footer.jsp"%>
+    <%@include file="../include/footer.jsp"%>
 
 </div>
 <!-- ./wrapper -->
 
-<%@include file="../inlcude/js.jsp"%>
+<%@include file="../include/js.jsp"%>
 
 <script src="/static/plugins/tree/js/jquery.ztree.all.min.js"></script>
-<script src="/static/plugins/layer/layer.js"></script>
 <script src="/static/plugins/datatables/jquery.dataTables.js"></script>
 <script src="/static/plugins/validate/jquery.validate.min.js"></script>
 <script>
