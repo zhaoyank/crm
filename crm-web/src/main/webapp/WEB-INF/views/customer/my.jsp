@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8" %>
 <!DOCTYPE html>
@@ -128,7 +129,7 @@
                             aria-hidden="true">&times;</span></button>
                     <h4 class="modal-title" id="myModalLabel">添加客户</h4>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body"  style="height: 400px;overflow:scroll">
                     <form method="post" id="addCustomerForm">
                         <div class="form-group">
                             <label>姓名</label>
@@ -161,12 +162,18 @@
                             <label>所属行业</label>
                             <select name="trade" id="trade" class="form-control">
                                 <option value="">--请选择--</option>
+                                <c:forEach items="${tradeList}" var="trade">
+                                    <option value="${trade.tradeName}">${trade.tradeName}</option>
+                                </c:forEach>
                             </select>
                         </div>
                         <div class="form-group">
                             <label>客户来源</label>
                             <select name="source" id="source" class="form-control">
                                 <option value="">--请选择--</option>
+                                <c:forEach items="${sourceList}" var="source">
+                                    <option value="${source.sourceName}">${source.sourceName}</option>
+                                </c:forEach>
                             </select>
                         </div>
                         <div class="form-group">
@@ -184,7 +191,6 @@
                             <label>备注</label>
                             <input type="text" id="mark" name="mark" class="form-control">
                         </div>
-
                     </form>
                 </div>
                 <div class="modal-footer">

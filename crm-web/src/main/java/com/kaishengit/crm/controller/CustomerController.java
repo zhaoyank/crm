@@ -3,7 +3,11 @@ package com.kaishengit.crm.controller;
 import com.github.pagehelper.PageInfo;
 import com.kaishengit.crm.entity.Account;
 import com.kaishengit.crm.entity.Customer;
+import com.kaishengit.crm.entity.Source;
+import com.kaishengit.crm.entity.Trade;
 import com.kaishengit.crm.service.CustomerService;
+import com.kaishengit.crm.service.SourceService;
+import com.kaishengit.crm.service.TradeService;
 import com.kaishengit.crm.web.exception.ForbiddenException;
 import com.kaishengit.crm.web.exception.NotFoundException;
 import com.kaishengit.util.JsonResult;
@@ -14,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -26,8 +31,18 @@ public class CustomerController extends BaseController {
     @Autowired
     private CustomerService customerService;
 
+    @Autowired
+    private TradeService tradeService;
+    @Autowired
+    private SourceService sourceService;
+
     @GetMapping("/my")
-    public String list() {
+    public String list(Model model) {
+        List<Trade> tradeList = tradeService.findAllTrade();
+        List<Source> sourceList = sourceService.findAllSoure();
+
+        model.addAttribute("tradeList",tradeList);
+        model.addAttribute("sourceList",sourceList);
         return "customer/my";
     }
 

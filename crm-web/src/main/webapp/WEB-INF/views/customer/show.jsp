@@ -14,6 +14,15 @@
         .td_title {
             font-weight: bold;
         }
+        .form-control {
+            border : none;
+        }
+        .form-control[disabled], .form-control[readonly], fieldset[disabled] .form-control {
+            background-color: white;
+        }
+        .table>tbody>tr>td {
+            vertical-align : middle;
+        }
     </style>
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -47,45 +56,62 @@
                 <div class="box-header with-border">
                     <h3 class="box-title">客户资料</h3>
                     <div class="box-tools">
-                        <a href="/customer/my" class="btn btn-primary btn-sm"><i class="fa fa-arrow-left"></i> 返回列表</a>
-                        <button class="btn bg-purple btn-sm"><i class="fa fa-pencil"></i> 编辑</button>
+                        <button id="saveEditBtn" class="btn btn-primary btn-sm" style="display: none;"><i class="fa fa-save"></i> 保存</button>
+                        <a href="javascript:;history.back()" class="btn btn-primary btn-sm"><i class="fa fa-arrow-left"></i> 返回列表</a>
+                        <button class="btn bg-purple btn-sm" id="editCustomerBtn"><i class="fa fa-pencil"></i> 编辑</button>
                         <button class="btn bg-orange btn-sm"><i class="fa fa-exchange"></i> 转交他人</button>
                         <button class="btn bg-maroon btn-sm"><i class="fa fa-recycle"></i> 放入公海</button>
                         <button class="btn btn-danger btn-sm"><i class="fa fa-trash-o"></i> 删除</button>
                     </div>
                 </div>
                 <div class="box-body no-padding">
+                    <form action="">
                     <table class="table">
                         <tr>
-                            <td class="td_title">姓名</td>
-                            <td>${customer.custName}</td>
+                            <td class="td_title"><span>姓名</span></td>
+                            <td><input type="text" disabled name="custName" class="form-control" value="${customer.custName}"></td>
                             <td class="td_title">职位</td>
-                            <td>${customer.job}</td>
+                            <td><input type="text" class="form-control" name="job" disabled value="${customer.job}"></td>
                             <td class="td_title">联系电话</td>
-                            <td>${customer.mobile}</td>
+                            <td><input type="text" class="form-control" name="mobile" disabled value="${customer.mobile}"></td>
                         </tr>
                         <tr>
                             <td class="td_title">所属行业</td>
-                            <td>${customer.trade}</td>
+                            <td>
+                                <select name="trade" class="form-control" disabled>
+                                    <option value="${customer.trade}" selected>${customer.trade}</option>
+                                </select>
+                            </td>
                             <td class="td_title">客户来源</td>
-                            <td>${customer.source}</td>
+                            <td>
+                                <select name="source" class="form-control" disabled>
+                                    <option value="${customer.source}" selected>${customer.source}</option>
+                                </select>
+                            </td>
                             <td class="td_title">级别</td>
-                            <td>${customer.level}</td>
+                            <td>
+                                <select name="level" class="form-control" disabled>
+                                    <option value="${customer.level}" selected>${customer.level}</option>
+                                </select>
+                            </td>
                         </tr>
                         <tr>
                             <td class="td_title">地址</td>
-                            <td colspan="5">${customer.address}</td>
+                            <td colspan="5"><input type="text" class="form-control" name="address" disabled value="${customer.address}"></td>
                         </tr>
                         <tr>
                             <td class="td_title">备注</td>
-                            <td colspan="5">${customer.mark}</td>
+                            <td colspan="5"><input type="text" class="form-control" name="mark" disabled value="${customer.mark}"></td>
                         </tr>
                     </table>
+                    </form>
                 </div>
+
                 <div class="box-footer">
                     <span style="color: #ccc" class="pull-right">创建日期： <fmt:formatDate value="${customer.createTime}"/>&nbsp;&nbsp;&nbsp;&nbsp;
                         最后修改日期：<fmt:formatDate value="${customer.createTime}"/></span>
                 </div>
+
             </div>
 
             <div class="row">
@@ -131,5 +157,18 @@
 <!-- ./wrapper -->
 
 <%@include file="../include/js.jsp"%>
+
+<script>
+    $("#editCustomerBtn").click(function () {
+        $("#saveEditBtn").css("display","inline");
+        $(".form-control").removeAttr("disabled");
+    });
+
+    $("#saveEditBtn").click(function () {
+        $("#saveEditBtn").css("display","none");
+        $(".form-control").attr("disabled", "disabled")
+    });
+</script>
+
 </body>
 </html>
