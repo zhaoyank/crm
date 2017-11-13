@@ -58,4 +58,10 @@ public interface AccountService {
      * @throws ServiceException 当该员工下有业务时,抛出该异常
      */
     void deleteEmployeeById(Integer id) throws ServiceException;
+
+    /**
+     * 查找所有账号列表
+     * @return
+     */
+    List<Account> findAllAccount();
 }

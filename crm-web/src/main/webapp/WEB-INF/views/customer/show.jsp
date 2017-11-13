@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -56,16 +57,15 @@
                 <div class="box-header with-border">
                     <h3 class="box-title">客户资料</h3>
                     <div class="box-tools">
-                        <button id="saveEditBtn" class="btn btn-primary btn-sm" style="display: none;"><i class="fa fa-save"></i> 保存</button>
                         <a href="javascript:;history.back()" class="btn btn-primary btn-sm"><i class="fa fa-arrow-left"></i> 返回列表</a>
                         <button class="btn bg-purple btn-sm" id="editCustomerBtn"><i class="fa fa-pencil"></i> 编辑</button>
-                        <button class="btn bg-orange btn-sm"><i class="fa fa-exchange"></i> 转交他人</button>
-                        <button class="btn bg-maroon btn-sm"><i class="fa fa-recycle"></i> 放入公海</button>
-                        <button class="btn btn-danger btn-sm"><i class="fa fa-trash-o"></i> 删除</button>
+                        <button class="btn bg-orange btn-sm" id="tranCustomerBtn"><i class="fa fa-exchange"></i> 转交他人</button>
+                        <button class="btn bg-maroon btn-sm" id="publicCustomerBtn"><i class="fa fa-recycle"></i> 放入公海</button>
+                        <a href="/customer/my/${customer.id}/delete"  class="btn btn-danger btn-sm" id="deleteCustomerBtn"><i class="fa fa-trash-o"></i> 删除</a>
                     </div>
                 </div>
                 <div class="box-body no-padding">
-                    <form action="">
+                    <form method="post" id="editCustomerForm">
                     <table class="table">
                         <tr>
                             <td class="td_title"><span>姓名</span></td>
@@ -79,19 +79,31 @@
                             <td class="td_title">所属行业</td>
                             <td>
                                 <select name="trade" class="form-control" disabled>
-                                    <option value="${customer.trade}" selected>${customer.trade}</option>
+                                    <option value="" ${customer.trade == "" ? "selected":""}></option>
+                                    <c:forEach items="${tradeList}" var="trade">
+                                        <option value="${trade.tradeName}" ${trade.tradeName == customer.trade ? "selected" : ""} >${trade.tradeName}</option>
+                                    </c:forEach>
                                 </select>
                             </td>
                             <td class="td_title">客户来源</td>
                             <td>
                                 <select name="source" class="form-control" disabled>
-                                    <option value="${customer.source}" selected>${customer.source}</option>
+                                    <option value="" ${customer.source == "" ? "selected":""}></option>
+                                    <c:forEach items="${sourceList}" var="source">
+                                        <option value="${source.sourceName}" ${source.sourceName == customer.source ? "selected" : ""}>${source.sourceName}</option>
+                                    </c:forEach>
+
                                 </select>
                             </td>
                             <td class="td_title">级别</td>
                             <td>
                                 <select name="level" class="form-control" disabled>
-                                    <option value="${customer.level}" selected>${customer.level}</option>
+                                    <option value="" ${customer.level == "" ? "selected":""}></option>
+                                    <option value="★" ${customer.level == "★" ? "selected":""}>★</option>
+                                    <option value="★★" ${customer.level == "★★" ? "selected":""}>★★</option>
+                                    <option value="★★★" ${customer.level == "★★★" ? "selected":""}>★★★</option>
+                                    <option value="★★★★" ${customer.level == "★★★★" ? "selected":""}>★★★★</option>
+                                    <option value="★★★★★" ${customer.level == "★★★★★" ? "selected":""}>★★★★★</option>
                                 </select>
                             </td>
                         </tr>
@@ -107,9 +119,17 @@
                     </form>
                 </div>
 
+
+
                 <div class="box-footer">
-                    <span style="color: #ccc" class="pull-right">创建日期： <fmt:formatDate value="${customer.createTime}"/>&nbsp;&nbsp;&nbsp;&nbsp;
-                        最后修改日期：<fmt:formatDate value="${customer.createTime}"/></span>
+                    <div>
+                        <span style="color: #ccc" class="pull-right">创建日期： <fmt:formatDate value="${customer.createTime}" type="full"/>&nbsp;&nbsp;&nbsp;&nbsp;
+                        最后修改日期：<fmt:formatDate value="${customer.createTime}" type="full"/></span>
+                    </div>
+                    <div class="box-tools">
+                        <button id="saveEditBtn" class="btn btn-primary btn-sm" style="display: none;"><i class="fa fa-save"></i> 保存</button>
+                        <button id="cancelEditBtn" type="reset" class="btn btn-primary btn-sm" style="display: none;"><i class="fa fa-save"></i> 取消</button>
+                    </div>
                 </div>
 
             </div>
@@ -153,21 +173,111 @@
     <!-- 底部 -->
     <%@include file="../include/footer.jsp"%>
 
+    <!-- 模态框 -->
+    <div class="modal fade" id="chooseAccountModal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">请选择要转交的账号</h4>
+                </div>
+                <div class="modal-body">
+                    <select id="userSelect" class="form-control" style="border: 1px solid #ccc">
+                        <option value="">--请选择--</option>
+                        <c:forEach items="${accountList}" var="account">
+                            <c:if test="${account.id != sessionScope.curr_account.id}">
+                                <option value="${account.id}">${account.userName}(${account.mobile})</option>
+                            </c:if>
+                        </c:forEach>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="button" id="saveTranBtn" class="btn btn-primary">确定</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+    <!-- /模态框 -->
+
 </div>
 <!-- ./wrapper -->
 
 <%@include file="../include/js.jsp"%>
+<script src="/static/plugins/validate/jquery.validate.min.js"></script>
 
 <script>
-    $("#editCustomerBtn").click(function () {
-        $("#saveEditBtn").css("display","inline");
-        $(".form-control").removeAttr("disabled");
+
+    var customerId = ${customer.id};
+
+    //将客户放入公海
+    $("#publicCustomerBtn").click(function () {
+        layer.confirm("确定要将客户放入公海吗?",function (index) {
+            layer.close(index);
+            window.location.href = "/customer/my/"+customerId+"/public";
+        });
     });
 
-    $("#saveEditBtn").click(function () {
-        $("#saveEditBtn").css("display","none");
-        $(".form-control").attr("disabled", "disabled")
+    //转交他人
+    $("#tranCustomerBtn").click(function () {
+        $("#chooseAccountModal").modal({
+            show : true,
+            backdrop: 'static'
+        });
     });
+    $("#saveTranBtn").click(function () {
+        var toAccountId = $("#userSelect").val();
+        var toAccountName = $("#userSelect option:selected").text();
+        layer.confirm("确定要将客户转交给"+toAccountName+"吗",function (index) {
+            layer.close(index);
+            window.location.href = "/customer/my/"+customerId+"/tran/"+toAccountId;
+        });
+    });
+
+
+    <!-- 编辑 -->
+    $("#editCustomerBtn").click(function () {
+        $(".form-control").css("border","1px solid #ccc");
+        $("#saveEditBtn").css("display","inline");
+        $("#cancelEditBtn").css("display","inline");
+        $(".form-control").removeAttr("disabled");
+    });
+    $("#cancelEditBtn").click(function () {
+        layer.confirm("取消后将不会保修已修改的信息",function (index) {
+            $("#editCustomerForm")[0].reset();
+            $(".form-control").css("border","none");
+            $("#saveEditBtn").css("display","none");
+            $("#cancelEditBtn").css("display","none");
+            $(".form-control").attr("disabled", "disabled");
+            layer.close(index);
+        })
+    });
+    $("#saveEditBtn").click(function () {
+        $("#editCustomerForm").submit();
+    });
+    $("#editCustomerForm").validate({
+        errorClass: "text-danger",
+        errorElement : "span",
+        rules : {
+            custName : {
+                required : true
+            },
+            mobile : {
+                required : true,
+                digits : true
+            }
+        },
+        messages : {
+            custName : {
+                required : "请输入姓名"
+            },
+            mobile : {
+                required : "请输入手机号",
+                digits : "格式错误(手机号码只能是纯数字组成)"
+            }
+        }
+    });
+
 </script>
 
 </body>

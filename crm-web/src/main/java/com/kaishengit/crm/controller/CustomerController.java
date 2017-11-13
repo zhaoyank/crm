@@ -5,6 +5,7 @@ import com.kaishengit.crm.entity.Account;
 import com.kaishengit.crm.entity.Customer;
 import com.kaishengit.crm.entity.Source;
 import com.kaishengit.crm.entity.Trade;
+import com.kaishengit.crm.service.AccountService;
 import com.kaishengit.crm.service.CustomerService;
 import com.kaishengit.crm.service.SourceService;
 import com.kaishengit.crm.service.TradeService;
@@ -15,8 +16,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +40,8 @@ public class CustomerController extends BaseController {
     private TradeService tradeService;
     @Autowired
     private SourceService sourceService;
+    @Autowired
+    private AccountService accountService;
 
     @GetMapping("/my")
     public String list(Model model) {
@@ -78,6 +85,107 @@ public class CustomerController extends BaseController {
     public String showMyCustomer(@PathVariable Integer id,
                                  HttpSession session,
                                  Model model) {
+        List<Trade> tradeList = tradeService.findAllTrade();
+        List<Source> sourceList = sourceService.findAllSoure();
+
+        Customer customer = permissions(session, id);
+        List<Account> accountList = accountService.findAllAccount();
+
+        model.addAttribute("accountList",accountList);
+        model.addAttribute("customer",customer);
+        model.addAttribute("tradeList",tradeList);
+        model.addAttribute("sourceList",sourceList);
+        return "customer/show";
+    }
+
+    @GetMapping("/my/{id:\\d+}/delete")
+    public String deleteCustomer(@PathVariable Integer id,
+                                 HttpSession session,
+                                 RedirectAttributes redirectAttributes) {
+        Customer customer = permissions(session, id);
+        customerService.deleteCustomer(customer);
+
+        redirectAttributes.addFlashAttribute("message", "客户删除成功");
+        return "redirect:/customer/my/";
+    }
+
+    @PostMapping("/my/{id:\\d+}")
+    public String editCustomer(Customer customer,
+                               HttpSession session,
+                               @PathVariable Integer id,
+                               RedirectAttributes redirectAttributes) {
+
+        permissions(session, id);
+        customerService.editCustomer(customer);
+        redirectAttributes.addFlashAttribute("message", "修改成功");
+        return "redirect:/customer/my/" + id;
+    }
+
+    @GetMapping("/my/{id:\\d+}/public")
+    public String publicCustomer(@PathVariable Integer id,
+                                 HttpSession session,
+                                 RedirectAttributes redirectAttributes) {
+        Customer customer = permissions(session, id);
+        customerService.publicCustomer(customer);
+        redirectAttributes.addFlashAttribute("message","将客户放入公海成功");
+        return "redirect:/customer/my";
+
+    }
+    /**
+     * 转交客户
+     * @return
+     */
+    @GetMapping("/my/{customerId:\\d+}/tran/{toAccountId:\\d+}")
+    public String tranCustomer(@PathVariable Integer customerId,
+                               @PathVariable Integer toAccountId,
+                               HttpSession session,
+                               RedirectAttributes redirectAttributes) {
+        Customer customer = permissions(session , customerId);
+        customerService.tranCustomer(customer,toAccountId);
+
+        redirectAttributes.addFlashAttribute("message","客户转交成功");
+        return "redirect:/customer/my";
+    }
+
+    /**
+     * 将数据导出为csv文件
+     */
+    @GetMapping("/my/export.csv")
+    public void exportCsvData(HttpServletResponse response,
+                              HttpSession session) throws IOException {
+        Account account = getCurrentAccount(session);
+
+        response.setContentType("text/csv;charset=GBK");
+        String fileName = new String("我的客户.csv".getBytes("UTF-8"),"ISO8859-1");
+        response.addHeader("Content-Disposition","attachment; filename=\""+fileName+"\"");
+
+        OutputStream outputStream = response.getOutputStream();
+        customerService.exportCsvFileToOutputStream(outputStream,account);
+    }
+
+    /**
+     * 将数据导出为xls文件
+     */
+    @GetMapping("/my/export.xls")
+    public void exportXlsData(HttpServletResponse response,
+                              HttpSession session) throws IOException {
+        Account account = getCurrentAccount(session);
+
+        response.setContentType("application/vnd.ms-excel");
+        String fileName = new String("我的客户.xls".getBytes("UTF-8"),"ISO8859-1");
+        response.addHeader("Content-Disposition","attachment; filename=\""+fileName+"\"");
+
+        OutputStream outputStream = response.getOutputStream();
+        customerService.exportXlsFileToOutputStream(outputStream,account);
+    }
+
+
+    @GetMapping("/public")
+    public String publicCustomer() {
+        return "customer/public";
+    }
+
+    private Customer permissions(HttpSession session, Integer id) {
         Account account = getCurrentAccount(session);
         Customer customer = customerService.findCustomerById(id);
 
@@ -88,8 +196,6 @@ public class CustomerController extends BaseController {
         if(!customer.getAccountId().equals(account.getId())) {
             throw new ForbiddenException("权限不足");
         }
-
-        model.addAttribute("customer",customer);
-        return "customer/show";
+        return customer;
     }
 }
