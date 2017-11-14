@@ -70,7 +70,7 @@
                             </c:if>
 
                             <c:forEach items="${sales}" var="sale">
-                                <tr class="dataTable" rel="${sale.id}">
+                                <tr class="dataRow" rel="${sale.id}">
                                     <td>${sale.name}</td>
                                     <td>${sale.custName}</td>
                                     <td><fmt:formatNumber value="${sale.worth}"/> </td>
@@ -118,7 +118,7 @@
                         </div>
                         <div class="form-group">
                             <label>机会价值</label>
-                            <input type="text" name="worth" class="form-control">
+                            <input type="text" id="worthInput" name="worth" class="form-control">
                         </div>
                         <div class="form-group">
                             <label>当前进度</label>
@@ -149,25 +149,91 @@
 <!-- ./wrapper -->
 
 <%@include file="../include/js.jsp"%>
-
+<script src="/static/plugins/validate/jquery.validate.min.js"></script>
 <script>
-
     $(function () {
-        $("#addChanceBtn").click(function () {
-            $("#addSaleChangeModal").modal({
-                show : true,
-                backdrop: 'static'
+
+        /*var num_cn = ['零','壹','贰','叁','肆','伍','陆','柒','捌','玖'];
+
+        $("#worthInput").keyup(function () {
+            list = [];
+            var worth = $(this).val();
+            var array = tranWorth(worth);
+            var str = '';
+            for(var i = 0; i < array.length; i ++) {
+                str += num_cn[array[i]];
+            }
+            console.log(str);
+        });
+
+        var list = [];
+        var tranWorth = function (number) {
+            var n = number;
+            for(var i = 0; i < number.length; i++) {
+                var yu = n % 10;
+                if(n > 10) {
+                    n = parseInt(n / 10);
+                    list.unshift(yu);
+                    tranWorth(n);
+                } else {
+                    list.unshift(n);
+                    return list;
+                }
+            }
+
+        }*/
+
+
+        $(function () {
+            $("#addChanceBtn").click(function () {
+                $("#addSaleChangeModal").modal({
+                    show : true,
+                    backdrop: 'static'
+                });
             });
         });
-    });
 
-    $("#saveChanceBtn").click(function () {
-        $("#addChanceForm").submit();
-    });
+        $("#saveChanceBtn").click(function () {
+            $("#addChanceForm").submit();
+        });
 
-    $(".dataTable").click(function () {
-        var id = $(this).attr("rel");
-        window.location.href = "/sales/my/" + id;
+        $("#addChanceForm").validate({
+            errorClass : "text-danger",
+            errorElement : "span",
+            rules : {
+                name : {
+                    required : true
+                },
+                custId : {
+                    required : true
+                },
+                worth : {
+                    required : true,
+                    number : true,
+                    min : 1
+                }
+            },
+            messages : {
+                name : {
+                    required : "请输入销售机会名称"
+                },
+                custId : {
+                    required : "请选择客户"
+                },
+                worth : {
+                    required : "请输入销售机会价值",
+                    number : "销售价值只能是有效数字",
+                    min : "销售价值只能是有效数字"
+                }
+            }
+        });
+
+
+
+        $(".dataRow").click(function () {
+            var id = $(this).attr("rel");
+            window.location.href = "/sales/my/" + id;
+        });
     });
 
 </script>

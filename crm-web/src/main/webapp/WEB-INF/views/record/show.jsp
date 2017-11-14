@@ -1,4 +1,5 @@
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8" %>
 <!DOCTYPE html>
@@ -65,7 +66,7 @@
                             <td class="td_title">当前进度</td>
                             <td>
                                 ${saleChance.progress}
-                                <button class="btn btn-xs btn-success" id="showChangeProgressModalBtn"><i class="fa fa-pencil"></i></button>
+                                <button class="btn btn-xs btn-success" id="ChangeProgressBtn"><i class="fa fa-pencil"></i></button>
                             </td>
                         </tr>
                     </table>
@@ -118,52 +119,59 @@
             <div class="row">
                 <div class="col-md-8">
                     <h4>跟进记录
-                        <small><button id="showRecordModalBtn" class="btn btn-success btn-xs"><i class="fa fa-plus"></i></button></small>
+                        <small><button id="addProgressBtn" class="btn btn-success btn-xs"><i class="fa fa-plus"></i></button></small>
                     </h4>
                     <ul class="timeline">
 
+                        <c:if test="${empty progressList}">
+                            <li>
+                                <!-- timeline icon -->
+                                <i class="fa fa-circle-o bg-red"></i>
+                                <div class="timeline-item">
+                                    <div class="timeline-body">
+                                        暂无跟进记录
+                                    </div>
+                                </div>
+                            </li>
+                        </c:if>
+                        <c:forEach items="${progressList}" var="progress">
+                            <c:choose>
+                                <c:when test="${progress.content == '将当前进度修改为: [成交]'}">
+                                    <li>
+                                        <i class="fa fa-check bg-green"></i>
+                                        <div class="timeline-item">
+                                            <span class="time"><i class="fa fa-clock-o"></i> <fmt:formatDate value="${progress.createTime}"/></span>
+                                            <div class="timeline-body">
+                                                ${progress.content}
+                                            </div>
+                                        </div>
+                                    </li>
+                                </c:when>
+                                <c:when test="${progress.content == '将当前进度修改为: [暂时搁置]'}">
+                                    <li>
+                                        <i class="fa fa-close bg-red"></i>
+                                        <div class="timeline-item">
+                                            <span class="time"><i class="fa fa-clock-o"></i> <fmt:formatDate value="${progress.createTime}"/></span>
+                                            <div class="timeline-body">
+                                                ${progress.content}
+                                            </div>
+                                        </div>
+                                    </li>
+                                </c:when>
+                                <c:otherwise>
+                                    <li>
+                                        <i class="fa fa-info bg-blue"></i>
+                                        <div class="timeline-item">
+                                            <span class="time"><i class="fa fa-clock-o"></i> <fmt:formatDate value="${progress.createTime}"/></span>
+                                            <div class="timeline-body">
+                                                ${progress.content}
+                                            </div>
+                                        </div>
+                                    </li>
+                                </c:otherwise>
+                            </c:choose>
 
-                        <%--<li>
-                            <!-- timeline icon -->
-                            <i class="fa fa-circle-o bg-red"></i>
-                            <div class="timeline-item">
-                                <div class="timeline-body">
-                                    暂无跟进记录
-                                </div>
-                            </div>
-                        </li>
-                        <li>
-                            <!-- timeline icon -->
-                            <i class="fa fa-check bg-green"></i>
-                            <div class="timeline-item">
-                                <span class="time"><i class="fa fa-clock-o"></i> <fmt:formatDate value="${record.createTime}"/></span>
-                                <div class="timeline-body">
-                                    将当前进度修改为 [成交]
-                                </div>
-                            </div>
-                        </li>
-
-                        <li>
-                            <!-- timeline icon -->
-                            <i class="fa fa-close bg-red"></i>
-                            <div class="timeline-item">
-                                <span class="time"><i class="fa fa-clock-o"></i> <fmt:formatDate value="${record.createTime}"/></span>
-                                <div class="timeline-body">
-                                    将当前进度修改为 [暂时搁置]
-                                </div>
-                            </div>
-                        </li>
-
-                        <li>
-                            <!-- timeline icon -->
-                            <i class="fa fa-info bg-blue"></i>
-                            <div class="timeline-item">
-                                <span class="time"><i class="fa fa-clock-o"></i> <fmt:formatDate value="${record.createTime}"/></span>
-                                <div class="timeline-body">
-                                    喜欢这个房子
-                                </div>
-                            </div>
-                        </li>--%>
+                        </c:forEach>
                     </ul>
                 </div>
                 <div class="col-md-4">
@@ -186,7 +194,7 @@
                 </div>
             </div>
 
-            <div class="modal fade" id="recordModal">
+            <div class="modal fade" id="addProgressModal">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -194,14 +202,14 @@
                             <h4 class="modal-title">添加跟进记录</h4>
                         </div>
                         <div class="modal-body">
-                            <form action="/sales/my/new/record" id="recordForm" method="post">
+                            <form action="/sales/my/new/record" id="addProgressForm" method="post">
                                 <input type="hidden" name="saleId" value="${saleChance.id}">
                                 <textarea id="recordContent"  class="form-control" name="content"></textarea>
                             </form>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                            <button type="button" class="btn btn-primary" id="saveRecordBtn">保存</button>
+                            <button type="button" class="btn btn-primary" id="saveProgressBtn">保存</button>
                         </div>
                     </div><!-- /.modal-content -->
                 </div><!-- /.modal-dialog -->
@@ -219,9 +227,11 @@
                             <form method="post" action="/sales/my/${saleChance.id}/progress/update" id="updateProgressForm">
                                 <input type="hidden" name="id" value="${saleChance.id}">
                                 <select name="progress" class="form-control">
-                                    <c:forEach items="${processList}" var="pro">
-                                        <option value="${pro}">${pro}</option>
-                                    </c:forEach>
+                                    <option value="初访">初访</option>
+                                    <option value="意向">意向</option>
+                                    <option value="报价">报价</option>
+                                    <option value="成交">成交</option>
+                                    <option value="暂时搁置">暂时搁置</option>
                                 </select>
                             </form>
                         </div>
@@ -242,5 +252,54 @@
 </div>
 <!-- ./wrapper -->
 <%@include file="../include/js.jsp"%>
+<script src="/static/plugins/validate/jquery.validate.min.js"></script>
+<script>
+    $(function () {
+        var salesId = ${saleChance.id};
+
+        $("#delBtn").click(function () {
+            layer.confirm("确定要删除此销售机会么?",function () {
+                window.location.href = "/sales/my/"+salesId+"/delete";
+            });
+        });
+
+
+        $("#addProgressBtn").click(function () {
+           $("#addProgressModal").modal({
+               show : true,
+               backdrop : 'static'
+           });
+        });
+        $("#saveProgressBtn").click(function () {
+            $("#addProgressForm").submit();
+        });
+        $("#addProgressForm").validate({
+            errorClass : "text-danger",
+            errorElement : "span",
+            rules : {
+                content : {
+                    required : true
+                }
+            },
+            messages : {
+                content : {
+                    required : "请输入更新的进度内容"
+                }
+            }
+        });
+
+
+        $("#ChangeProgressBtn").click(function () {
+            $("#changeProgressModal").modal({
+                show : true,
+                backdrop : 'static'
+            });
+        });
+        $("#saveProgress").click(function () {
+            $("#updateProgressForm").submit();
+        });
+
+    });
+</script>
 </body>
 </html>

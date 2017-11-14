@@ -61,7 +61,7 @@
                         <button class="btn bg-purple btn-sm" id="editCustomerBtn"><i class="fa fa-pencil"></i> 编辑</button>
                         <button class="btn bg-orange btn-sm" id="tranCustomerBtn"><i class="fa fa-exchange"></i> 转交他人</button>
                         <button class="btn bg-maroon btn-sm" id="publicCustomerBtn"><i class="fa fa-recycle"></i> 放入公海</button>
-                        <a href="/customer/my/${customer.id}/delete"  class="btn btn-danger btn-sm" id="deleteCustomerBtn"><i class="fa fa-trash-o"></i> 删除</a>
+                        <button class="btn btn-danger btn-sm" id="deleteCustomerBtn"><i class="fa fa-trash-o"></i> 删除</button>
                     </div>
                 </div>
                 <div class="box-body no-padding">
@@ -209,6 +209,14 @@
 <script>
 
     var customerId = ${customer.id};
+
+    $("#deleteCustomerBtn").click(function () {
+        layer.confirm("确定要删除此客户么?",function () {
+            window.location.href = "/customer/my/" + customerId + "/delete";
+        });
+    });
+
+
 
     //将客户放入公海
     $("#publicCustomerBtn").click(function () {

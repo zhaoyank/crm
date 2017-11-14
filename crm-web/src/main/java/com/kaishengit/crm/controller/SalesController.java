@@ -3,7 +3,9 @@ package com.kaishengit.crm.controller;
 import com.kaishengit.crm.entity.Account;
 import com.kaishengit.crm.entity.Customer;
 import com.kaishengit.crm.entity.SaleChance;
+import com.kaishengit.crm.entity.SaleChanceProgress;
 import com.kaishengit.crm.service.CustomerService;
+import com.kaishengit.crm.service.SaleChanceProgressService;
 import com.kaishengit.crm.service.SaleChanceService;
 import com.kaishengit.crm.web.exception.ForbiddenException;
 import com.kaishengit.crm.web.exception.NotFoundException;
@@ -28,6 +30,9 @@ public class SalesController extends BaseController {
 
     @Autowired
     private SaleChanceService saleChanceService;
+
+    @Autowired
+    private SaleChanceProgressService saleChanceProgressService;
 
     @Autowired
     private CustomerService customerService;
@@ -59,15 +64,39 @@ public class SalesController extends BaseController {
                              Model model) {
         SaleChance saleChance = permissions(session , saleChanceId);
         Customer customer = customerService.findCustomerById(saleChance.getCustId());
+        List<SaleChanceProgress> progressList = saleChanceProgressService.findProgressBySaleId(saleChanceId);
 
         model.addAttribute("saleChance", saleChance);
         model.addAttribute("customer", customer);
+        model.addAttribute("progressList",progressList);
         return "record/show";
     }
 
+    @PostMapping("/my/new/record")
+    public String newChanceProgress(SaleChanceProgress saleChanceProgress,
+                                    HttpSession session) {
+        permissions(session , saleChanceProgress.getSaleId());
+        saleChanceProgressService.saveNewProgress(saleChanceProgress);
+        System.out.println(saleChanceProgress.getSaleId());
+        return "redirect:/sales/my/" + saleChanceProgress.getSaleId();
+    }
 
+    @PostMapping("/my/{id:\\d+}/progress/update")
+    public String changeSaleChanceProgress(@PathVariable Integer id,
+                                           String progress,
+                                           HttpSession session) {
+        SaleChance saleChance = permissions(session, id);
+        saleChanceService.updateSaleChanceProgress(saleChance, progress);
+        return "redirect:/sales/my/" + id;
+    }
 
-
+    @GetMapping("/my/{id:\\d+}/delete")
+    public String deleteSaleChance(@PathVariable Integer id,
+                                   HttpSession session) {
+        permissions(session , id);
+        saleChanceService.deleteSalesChanceById(id);
+        return "redirect:/sales/my";
+    }
 
     private SaleChance permissions(HttpSession session, Integer id) {
         Account account = getCurrentAccount(session);

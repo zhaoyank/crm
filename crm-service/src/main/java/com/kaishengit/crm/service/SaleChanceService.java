@@ -30,4 +30,16 @@ public interface SaleChanceService {
      */
     SaleChance findSaleChanceById(Integer id);
 
+    /**
+     * 更新销售机会的进度记录
+     * @param saleChance
+     * @param progress
+     */
+    void updateSaleChanceProgress(SaleChance saleChance, String progress);
+
+    /**
+     * 根据主键删除销售机会
+     * @param id
+     */
+    void deleteSalesChanceById(Integer id);
 }

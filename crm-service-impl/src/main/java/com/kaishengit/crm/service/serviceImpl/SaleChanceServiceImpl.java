@@ -71,4 +71,59 @@ public class SaleChanceServiceImpl implements SaleChanceService {
     public SaleChance findSaleChanceById(Integer id) {
         return saleChanceMapper.selectByPrimaryKey(id);
     }
+
+    /**
+     * 更新销售机会的进度记录
+     * @param saleChance
+     * @param progress
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateSaleChanceProgress(SaleChance saleChance, String progress) {
+        saleChance.setLastTime(new Date());
+        saleChance.setProgress(progress);
+        saleChanceMapper.updateByPrimaryKeySelective(saleChance);
+
+        Customer customer = customerMapper.selectByPrimaryKey(saleChance.getCustId());
+        customer.setLastContactTime(new Date());
+        customerMapper.updateByPrimaryKeySelective(customer);
+
+        SaleChanceProgress saleChanceProgress = new SaleChanceProgress();
+        saleChanceProgress.setCreateTime(new Date());
+        saleChanceProgress.setContent("将当前进度修改为: [" + progress + "]");
+        saleChanceProgress.setSaleId(saleChance.getId());
+        saleChanceProgressMapper.insert(saleChanceProgress);
+    }
+
+    /**
+     * 根据主键删除销售机会
+     * 删除此销售机会的进度信息
+     * 更改此客户最后跟进时间
+     * @param id
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteSalesChanceById(Integer id) {
+        SaleChance saleChance = saleChanceMapper.selectByPrimaryKey(id);
+
+        SaleChanceProgressExample recordExample = new SaleChanceProgressExample();
+        recordExample.createCriteria().andSaleIdEqualTo(id);
+
+        saleChanceProgressMapper.deleteByExample(recordExample);
+
+        saleChanceMapper.deleteByPrimaryKey(id);
+
+        SaleChanceExample example = new SaleChanceExample();
+        example.createCriteria().andCustIdEqualTo(saleChance.getCustId());
+        example.setOrderByClause("last_time desc");
+        List<SaleChance> saleChanceList = saleChanceMapper.selectByExample(example);
+
+        Customer customer = customerMapper.selectByPrimaryKey(saleChance.getCustId());
+        if(saleChanceList.isEmpty()) {
+            customer.setLastContactTime(null);
+        } else {
+            customer.setLastContactTime(saleChanceList.get(0).getLastTime());
+        }
+        customerMapper.updateByPrimaryKeySelective(customer);
+    }
 }
