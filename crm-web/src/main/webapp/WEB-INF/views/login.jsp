@@ -8,22 +8,9 @@
     <title>凯盛软件CRM</title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-    <!-- Bootstrap 3.3.6 -->
-    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="/static/plugins/font-awesome/css/font-awesome.min.css">
-    <!-- Theme style -->
-    <link rel="stylesheet" href="/static/dist/css/AdminLTE.min.css">
-
-    <!-- AdminLTE Skins. Choose a skin from the css/skins
-         folder instead of downloading all of them to reduce the load. -->
-    <link rel="stylesheet" href="/static/dist/css/skins/_all-skins.min.css">
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-    <script src="https://cdn.bootcss.com/html5shiv/r29/html5.min.js"></script>
-    <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
+    
+    <%@include file="include/css.jsp"%>
+    
 </head>
 <body class="hold-transition login-page">
 <div class="login-box">

@@ -11,7 +11,7 @@ public class SaleChance implements Serializable {
 
     private String name;
 
-    private Integer custId;//custId
+    private Integer custId;
 
     private String custName;
 

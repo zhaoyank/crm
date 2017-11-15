@@ -12,12 +12,6 @@
     
     <%@include file="../include/css.jsp"%>
 
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
     <style>
         .td_title {
             font-weight: bold;
@@ -227,7 +221,7 @@
                             <form method="post" action="/sales/my/${saleChance.id}/progress/update" id="updateProgressForm">
                                 <input type="hidden" name="id" value="${saleChance.id}">
                                 <select name="progress" class="form-control">
-                                    <option value="初访">初访</option>
+                                    <option value="初访"}>初访</option>
                                     <option value="意向">意向</option>
                                     <option value="报价">报价</option>
                                     <option value="成交">成交</option>

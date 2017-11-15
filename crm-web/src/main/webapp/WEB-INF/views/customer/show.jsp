@@ -25,12 +25,7 @@
             vertical-align : middle;
         }
     </style>
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
+
 </head>
 <body class="hold-transition skin-blue sidebar-mini">
 <!-- Site wrapper -->
@@ -123,8 +118,8 @@
 
                 <div class="box-footer">
                     <div>
-                        <span style="color: #ccc" class="pull-right">创建日期： <fmt:formatDate value="${customer.createTime}" type="full"/>&nbsp;&nbsp;&nbsp;&nbsp;
-                        最后修改日期：<fmt:formatDate value="${customer.createTime}" type="full"/></span>
+                        <span style="color: #ccc" class="pull-right">创建日期： <fmt:formatDate value="${customer.createTime}"/>&nbsp;&nbsp;&nbsp;&nbsp;
+                        最后修改日期：<fmt:formatDate value="${customer.createTime}"/></span>
                     </div>
                     <div class="box-tools">
                         <button id="saveEditBtn" class="btn btn-primary btn-sm" style="display: none;"><i class="fa fa-save"></i> 保存</button>
@@ -138,10 +133,16 @@
                 <div class="col-md-8">
                     <div class="box">
                         <div class="box-header with-border">
-                            <h3 class="box-title">跟进记录</h3>
+                            <h3 class="box-title">销售机会</h3>
                         </div>
                         <div class="box-body">
-
+                            <ul class="list-group">
+                                <c:forEach items="${saleChanceList}" var="chance">
+                                    <li class="list-group-item">
+                                        <a href="/sales/my/${chance.id}" target="_blank">${chance.name}</a>
+                                    </li>
+                                </c:forEach>
+                            </ul>
                         </div>
                     </div>
                 </div>

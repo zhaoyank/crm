@@ -42,4 +42,12 @@ public interface SaleChanceService {
      * @param id
      */
     void deleteSalesChanceById(Integer id);
+
+    /**
+     * 根据当前账号和客户ID查询对应的销售计划
+     * @param accountId
+     * @param custId
+     * @return
+     */
+    List<SaleChance> findByAccountIdAndCustId(Integer accountId, Integer custId);
 }

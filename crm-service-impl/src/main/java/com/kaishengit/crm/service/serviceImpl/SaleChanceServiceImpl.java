@@ -63,7 +63,6 @@ public class SaleChanceServiceImpl implements SaleChanceService {
 
     /**
      * 根据id查询对应销售机会
-     *
      * @param id
      * @return
      */
@@ -125,5 +124,20 @@ public class SaleChanceServiceImpl implements SaleChanceService {
             customer.setLastContactTime(saleChanceList.get(0).getLastTime());
         }
         customerMapper.updateByPrimaryKeySelective(customer);
+    }
+
+    /**
+     * 根据当前账号和客户ID查询对应的销售计划
+     * @param accountId
+     * @param custId
+     * @return
+     */
+    @Override
+    public List<SaleChance> findByAccountIdAndCustId(Integer accountId, Integer custId) {
+        SaleChanceExample saleChanceExample = new SaleChanceExample();
+        saleChanceExample.createCriteria()
+                .andAccountIdEqualTo(accountId)
+                .andCustIdEqualTo(custId);
+        return saleChanceMapper.selectByExample(saleChanceExample);
     }
 }

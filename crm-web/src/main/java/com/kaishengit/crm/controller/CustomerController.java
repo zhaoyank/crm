@@ -1,14 +1,8 @@
 package com.kaishengit.crm.controller;
 
 import com.github.pagehelper.PageInfo;
-import com.kaishengit.crm.entity.Account;
-import com.kaishengit.crm.entity.Customer;
-import com.kaishengit.crm.entity.Source;
-import com.kaishengit.crm.entity.Trade;
-import com.kaishengit.crm.service.AccountService;
-import com.kaishengit.crm.service.CustomerService;
-import com.kaishengit.crm.service.SourceService;
-import com.kaishengit.crm.service.TradeService;
+import com.kaishengit.crm.entity.*;
+import com.kaishengit.crm.service.*;
 import com.kaishengit.crm.web.exception.ForbiddenException;
 import com.kaishengit.crm.web.exception.NotFoundException;
 import com.kaishengit.util.JsonResult;
@@ -42,6 +36,8 @@ public class CustomerController extends BaseController {
     private SourceService sourceService;
     @Autowired
     private AccountService accountService;
+    @Autowired
+    private SaleChanceService saleChanceService;
 
     @GetMapping("/my")
     public String list(Model model) {
@@ -91,10 +87,14 @@ public class CustomerController extends BaseController {
         Customer customer = permissions(session, id);
         List<Account> accountList = accountService.findAllAccount();
 
+        Integer accountId = getCurrentAccount(session).getId();
+        List<SaleChance> saleChanceList = saleChanceService.findByAccountIdAndCustId(accountId, id);
+
         model.addAttribute("accountList",accountList);
         model.addAttribute("customer",customer);
         model.addAttribute("tradeList",tradeList);
         model.addAttribute("sourceList",sourceList);
+        model.addAttribute("saleChanceList",saleChanceList);
         return "customer/show";
     }
 
