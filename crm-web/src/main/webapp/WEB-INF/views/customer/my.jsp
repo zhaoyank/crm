@@ -54,7 +54,7 @@
 
     <!-- 左侧菜单栏 -->
     <jsp:include page="../include/left-side.jsp">
-        <jsp:param name="menu" value="customer"/>
+        <jsp:param name="menu" value="customer_my"/>
     </jsp:include>
 
     <!-- =============================================== -->
@@ -92,19 +92,19 @@
                 <div class="box-body no-padding">
                     <table class="table table-hover">
                         <thead>
-                        <tr>
-                            <th width="80"></th>
-                            <th>姓名</th>
-                            <th>职位</th>
-                            <th>跟进时间</th>
-                            <th>级别</th>
-                            <th>联系方式</th>
-                        </tr>
+                            <tr>
+                                <th width="80"></th>
+                                <th>姓名</th>
+                                <th>职位</th>
+                                <th>跟进时间</th>
+                                <th>级别</th>
+                                <th>联系方式</th>
+                            </tr>
                         </thead>
                         <tbody id="custTable">
-
+                        </tbody>
                     </table>
-                    <ul id="pagination" class="pagination pull-right"></ul>
+                    <%--<ul id="pagination" class="pagination pull-right"></ul>--%>
                 </div>
 
 
@@ -212,7 +212,7 @@
 <%@include file="../include/js.jsp" %>
 <script src="/static/plugins/validate/jquery.validate.min.js"></script>
 <script src="/static/dist/js/jquery.twbsPagination.min.js"></script>
-
+<script src="/static/plugins/moment/moment.js"></script>
 <script>
     $(function () {
 
@@ -245,10 +245,7 @@
         var showRow = function(list) {
             for (var i = 0; i < list.length; i++) {
                 var obj = list[i];
-                var timestamp = obj.lastContactTime;
-                var newDate = new Date();
-                newDate.setTime(timestamp);
-                var html = '<tr class="dataRow" rel="'+obj.id+'"><td><span class="name-avatar '+(obj.sex == '女'? 'pink': '')+'">' + obj.custName.substring(0, 1) + '</span></td><td>' + obj.custName + '</td><td>' + obj.job + '</td><td>' + newDate + '</td><td class="star">' + obj.level + '</td><td><i class="fa fa-phone"></i> ' + obj.mobile + '<br></td></tr>';
+                var html = '<tr class="dataRow" rel="'+obj.id+'"><td><span class="name-avatar '+(obj.sex == '女'? 'pink': '')+'">' + obj.custName.substring(0, 1) + '</span></td><td>' + obj.custName + '</td><td>' + obj.job + '</td><td>' + moment(obj.lastContactTime).format("YYYY-MM-DD HH:mm") + '</td><td class="star">' + obj.level + '</td><td><i class="fa fa-phone"></i> ' + obj.mobile + '<br></td></tr>';
                 $("#custTable").append(html);
             }
         }

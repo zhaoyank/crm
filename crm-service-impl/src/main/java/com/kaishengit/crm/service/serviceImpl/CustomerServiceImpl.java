@@ -8,6 +8,7 @@ import com.kaishengit.crm.entity.CustomerExample;
 import com.kaishengit.crm.mapper.AccountMapper;
 import com.kaishengit.crm.mapper.CustomerMapper;
 import com.kaishengit.crm.service.CustomerService;
+import com.kaishengit.crm.service.exception.ServiceException;
 import org.apache.commons.io.IOUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -203,5 +204,34 @@ public class CustomerServiceImpl implements CustomerService {
         workbook.write(outputStream);
         outputStream.flush();
         outputStream.close();
+    }
+
+    /**
+     * 查询所有的公海客户
+     *
+     * @return
+     */
+    @Override
+    public List<Customer> findPublicCustomer() {
+        CustomerExample customerExample = new CustomerExample();
+        customerExample.createCriteria().andAccountIdIsNull();
+        return customerMapper.selectByExample(customerExample);
+    }
+
+    /**
+     * 将公海客户转为account的客户
+     * @param id  公海客户id
+     * @param account
+     */
+    @Override
+    public void tranCustomerToMy(Integer id, Account account) {
+        Customer customer = customerMapper.selectByPrimaryKey(id);
+        if (customer.getAccountId() != null) {
+            throw new ServiceException("该客户不是公海客户");
+        }
+
+        customer.setAccountId(account.getId());
+        customer.setReminder(customer.getReminder() + "->" + account.getUserName() + "从公海客户中取得该客户");
+        customerMapper.updateByPrimaryKeySelective(customer);
     }
 }

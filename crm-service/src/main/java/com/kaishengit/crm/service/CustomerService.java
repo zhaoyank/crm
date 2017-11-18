@@ -78,4 +78,17 @@ public interface CustomerService {
      * @param account
      */
     void exportXlsFileToOutputStream(OutputStream outputStream, Account account) throws IOException;
+
+    /**
+     * 查询所有的公海客户
+     * @return
+     */
+    List<Customer> findPublicCustomer();
+
+    /**
+     * 将公海客户转为account的客户
+     * @param id 公海客户id
+     * @param account
+     */
+    void tranCustomerToMy(Integer id, Account account);
 }

@@ -3,6 +3,7 @@ package com.kaishengit.crm.controller;
 import com.github.pagehelper.PageInfo;
 import com.kaishengit.crm.entity.*;
 import com.kaishengit.crm.service.*;
+import com.kaishengit.crm.service.exception.ServiceException;
 import com.kaishengit.crm.web.exception.ForbiddenException;
 import com.kaishengit.crm.web.exception.NotFoundException;
 import com.kaishengit.util.JsonResult;
@@ -147,6 +148,26 @@ public class CustomerController extends BaseController {
         return "redirect:/customer/my";
     }
 
+    @GetMapping("/public/{id:\\d+}")
+    public String publicCustomerDetail(@PathVariable Integer id,
+                                       Model model) {
+        Customer customer = customerService.findCustomerById(id);
+        model.addAttribute("customer", customer);
+        return "customer/public_show";
+    }
+
+    @GetMapping("/tran/{id:\\d+}/my")
+    public String getPublicCustomer(@PathVariable Integer id,
+                                    HttpSession session) {
+        Account account = getCurrentAccount(session);
+        try {
+            customerService.tranCustomerToMy(id, account);
+        } catch (ServiceException ex) {
+            throw new ForbiddenException(ex.getMessage());
+        }
+        return "redirect:/customer/my";
+    }
+
     /**
      * 将数据导出为csv文件
      */
@@ -179,11 +200,14 @@ public class CustomerController extends BaseController {
         customerService.exportXlsFileToOutputStream(outputStream,account);
     }
 
-
     @GetMapping("/public")
-    public String publicCustomer() {
+    public String publicCustomer(Model model) {
+        List<Customer> customerList = customerService.findPublicCustomer();
+        model.addAttribute("customerList", customerList);
         return "customer/public";
     }
+
+
 
     private Customer permissions(HttpSession session, Integer id) {
         Account account = getCurrentAccount(session);

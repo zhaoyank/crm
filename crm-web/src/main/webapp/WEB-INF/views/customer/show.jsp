@@ -38,7 +38,7 @@
 
     <!-- 左侧菜单栏 -->
     <jsp:include page="../include/left-side.jsp">
-        <jsp:param name="menu" value="customer"/>
+        <jsp:param name="menu" value="customer_my"/>
     </jsp:include>
 
     <!-- =============================================== -->
