@@ -48,4 +48,14 @@ public interface FileService {
      * @return
      */
     InputStream downloadFile(Integer id) throws FileNotFoundException, IOException;
+
+    /**
+     * 在数据库中保存上传文件
+     * @param pId
+     * @param accountId
+     * @param saveName
+     * @param fileName
+     * @param fileSize
+     */
+    void uploadFileToDB(Integer pId, Integer accountId, String saveName, String fileName, Long fileSize);
 }

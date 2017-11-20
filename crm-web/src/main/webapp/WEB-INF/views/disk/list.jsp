@@ -136,10 +136,10 @@
                                 </td>
                                 <td class="file_detail" rel="${file.id}">
                                     ${file.fileName}
-                                    <sapn class="tools pull-right">
+                                   <%-- <sapn class="tools pull-right">
                                         <i class="fa fa-edit"></i>
                                         <i class="fa fa-trash-o"></i>
-                                    </sapn>
+                                    </sapn>--%>
                                 </td>
                                 <td><fmt:formatDate value="${file.updateTime}" pattern="YYYY-MM-dd"/> </td>
                                 <td width="100">
@@ -218,6 +218,8 @@
     $(function () {
         var pId = ${not empty requestScope.file ? requestScope.file.id : '0'};
         var accountId = ${sessionScope.curr_account.id};
+        var upToken = '${requestScope.upToken}';
+
 
         <!--重命名-->
         $(document).delegate(".reNameLink","click",function () {
@@ -277,12 +279,11 @@
         var uploader = WebUploader.create({
             pick:"#picker",
             swf:'/static/plugins/webuploader/Uploader.swf',
-            server:'/disk/upload',
+            server: 'http://upload-z1.qiniu.com',
             auto:true,
             fileVal:"file",
             formData:{
-                "pId":pId,
-                "accountId":accountId
+                'token' : upToken
             }
         });
         var loadIndex = -1;
@@ -290,20 +291,24 @@
         uploader.on('uploadStart',function (file) {
             loadIndex = layer.load(2);
         });
-
+        //上传成功
         uploader.on('uploadSuccess',function (file,data) {
-            if(data.state == 'success') {
-                layer.msg("文件上传成功");
-                appendTr(data);
-            } else {
-                layer.msg(data.message);
-            }
+            console.log(file);
+            $.get("/disk/upload/cloud",{'saveName':data.key,'fileName':file.name,'size':file.size,'pId':pId}).done(function (resp) {
+                if (resp.state == "success") {
+                    appendTr(resp);
+                } else {
+                    layer.msg(resp.message);
+                }
+            }).error(function () {
+                layer.error("服务器异常");
+            });
         });
-
+        //上传失败
         uploader.on('uploadError',function (file) {
             layer.msg("上传失败，服务器异常");
         });
-
+        //上传结束(无论成功还是失败)
         uploader.on('uploadComplete',function (file) {
             layer.close(loadIndex);
         });

@@ -12,6 +12,9 @@
 
     <mvc:annotation-driven/>
 
+
+    <context:property-placeholder location="classpath:config.properties"/>
+
     <!--忽视静态资源-->
     <mvc:default-servlet-handler/>
 

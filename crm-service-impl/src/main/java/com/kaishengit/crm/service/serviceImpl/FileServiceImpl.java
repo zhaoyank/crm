@@ -27,7 +27,7 @@ public class FileServiceImpl implements FileService {
     private FileMapper fileMapper;
 
     @Autowired
-    @Qualifier("localFileStore")
+    @Qualifier("qiNiuCloudFileStore")
     private FileStore fileStore;
 
     @Value("${filepath}")
@@ -126,5 +126,27 @@ public class FileServiceImpl implements FileService {
         fileMapper.updateByPrimaryKeySelective(file);
 
         return fileStore.downloadFile(file.getSaveName());
+    }
+
+    /**
+     * 在数据库中保存上传文件
+     * @param pId
+     * @param accountId
+     * @param saveName
+     * @param fileName
+     * @param fileSize
+     */
+    @Override
+    public void uploadFileToDB(Integer pId, Integer accountId, String saveName, String fileName, Long fileSize) {
+        File file = new File();
+        file.setType(File.FILE_TYPE_FILE);
+        file.setDownloadCount(0);
+        file.setAccountId(accountId);
+        file.setpId(pId);
+        file.setUpdateTime(new Date());
+        file.setFileName(fileName);
+        file.setFileSize(FileUtils.byteCountToDisplaySize(fileSize));
+        file.setSaveName(saveName);
+        fileMapper.insertSelective(file);
     }
 }
