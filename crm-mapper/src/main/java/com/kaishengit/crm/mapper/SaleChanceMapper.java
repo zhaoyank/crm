@@ -3,6 +3,8 @@ package com.kaishengit.crm.mapper;
 import com.kaishengit.crm.entity.SaleChance;
 import com.kaishengit.crm.entity.SaleChanceExample;
 import java.util.List;
+import java.util.Map;
+
 import org.apache.ibatis.annotations.Param;
 
 public interface SaleChanceMapper {
@@ -40,4 +42,10 @@ public interface SaleChanceMapper {
      * @return
      */
     List<SaleChance> selectSaleChangeByAccountIdWithCustName(Integer accountId);
+
+    /**
+     * 查询各进度下的数量
+     * @return
+     */
+    List<Map<String,Object>> countByProgress();
 }

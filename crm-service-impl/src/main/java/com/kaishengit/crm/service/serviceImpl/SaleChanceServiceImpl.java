@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author zhao
@@ -139,5 +140,14 @@ public class SaleChanceServiceImpl implements SaleChanceService {
                 .andAccountIdEqualTo(accountId)
                 .andCustIdEqualTo(custId);
         return saleChanceMapper.selectByExample(saleChanceExample);
+    }
+
+    /**
+     * 查询各进度下的数量
+     * @return
+     */
+    @Override
+    public List<Map<String, Object>> countByProgress() {
+        return saleChanceMapper.countByProgress();
     }
 }

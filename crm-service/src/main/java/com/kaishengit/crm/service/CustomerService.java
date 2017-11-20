@@ -69,6 +69,7 @@ public interface CustomerService {
      * 将客户列表导出为csv文件
      * @param outputStream
      * @param account
+     * @throws IOException
      */
     void exportCsvFileToOutputStream(OutputStream outputStream, Account account) throws IOException;
 
@@ -76,6 +77,7 @@ public interface CustomerService {
      * 将客户列表导出为xls文件
      * @param outputStream
      * @param account
+     * @throws IOException
      */
     void exportXlsFileToOutputStream(OutputStream outputStream, Account account) throws IOException;
 
@@ -91,4 +93,22 @@ public interface CustomerService {
      * @param account
      */
     void tranCustomerToMy(Integer id, Account account);
+
+    /**
+     * 查询各级别客户数量
+     * @return
+     */
+    List<Map<String, Object>> countCustomerByLevel();
+
+    /**
+     * 查询各来源的客户数量
+     * @return
+     */
+    List<Map<String,Object>> countCustomerBySource();
+
+    /**
+     * 根据月份查询每月的新增客户数量
+     * @return
+     */
+    List<Map<String,Object>> countByMonth();
 }

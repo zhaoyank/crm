@@ -4,6 +4,7 @@ import com.kaishengit.crm.entity.Account;
 import com.kaishengit.crm.entity.SaleChance;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author zhao
@@ -50,4 +51,11 @@ public interface SaleChanceService {
      * @return
      */
     List<SaleChance> findByAccountIdAndCustId(Integer accountId, Integer custId);
+
+    /**
+     * 查询各进度下的数量
+     * @return
+     */
+    List<Map<String,Object>> countByProgress();
+
 }

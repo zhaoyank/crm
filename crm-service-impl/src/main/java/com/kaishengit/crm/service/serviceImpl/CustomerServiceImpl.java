@@ -234,4 +234,32 @@ public class CustomerServiceImpl implements CustomerService {
         customer.setReminder(customer.getReminder() + "->" + account.getUserName() + "从公海客户中取得该客户");
         customerMapper.updateByPrimaryKeySelective(customer);
     }
+
+    /**
+     * 查询各级别客户数量
+     * @return
+     */
+    @Override
+    public List<Map<String, Object>> countCustomerByLevel() {
+        return customerMapper.countCustomerByLevel();
+    }
+
+    /**
+     * 查询各来源的客户数量
+     * @return
+     */
+    @Override
+    public List<Map<String, Object>> countCustomerBySource() {
+        return customerMapper.countCustomerBySource();
+    }
+
+    /**
+     * 根据月份查询每月的新增客户数量
+     *
+     * @return
+     */
+    @Override
+    public List<Map<String, Object>> countByMonth() {
+        return customerMapper.countByMonth();
+    }
 }

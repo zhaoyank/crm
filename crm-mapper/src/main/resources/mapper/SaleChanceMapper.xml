@@ -217,6 +217,15 @@
             sale_chance.account_id = #{accountId}
         ORDER BY id desc
     </select>
+    <select id="countByProgress" resultType="java.util.Map">
+        SELECT
+            count(*) AS `value`,
+            `progress` as `name`
+        FROM
+            sale_chance
+        GROUP BY
+            progress
+    </select>
 
     <update id="updateByExampleSelective" parameterType="map">
         update sale_chance

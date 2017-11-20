@@ -36,7 +36,7 @@
                 </a>
             </li>
             <!-- 统计报表 -->
-            <li class="treeview">
+            <li class="treeview ${fn:startsWith(param.menu, 'charts') ? 'active' : ''}">
                 <a href="#">
                     <i class="fa fa-pie-chart"></i> <span>统计报表</span>
                     <span class="pull-right-container">
@@ -44,8 +44,8 @@
             </span>
                 </a>
                 <ul class="treeview-menu">
-                    <li><a href="/task"><i class="fa fa-circle-o"></i> 待办列表</a></li>
-                    <li><a href="/task/past"><i class="fa fa-circle-o"></i> 逾期事项</a></li>
+                    <li class="${param.menu == "charts_customer"? "active" : ""}"><a href="/charts"><i class="fa fa-circle-o"></i>客户报表</a></li>
+                    <li><a href="/task/past"><i class="fa fa-circle-o"></i> ...</a></li>
                 </ul>
             </li>
 

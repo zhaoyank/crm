@@ -52,7 +52,7 @@
                 <div class="box-header with-border">
                     <h3 class="box-title">客户资料</h3>
                     <div class="box-tools">
-                        <a href="javascript:;history.back()" class="btn btn-primary btn-sm"><i class="fa fa-arrow-left"></i> 返回列表</a>
+                        <a href="/customer/my" class="btn btn-primary btn-sm"><i class="fa fa-arrow-left"></i> 返回列表</a>
                         <button class="btn bg-purple btn-sm" id="editCustomerBtn"><i class="fa fa-pencil"></i> 编辑</button>
                         <button class="btn bg-orange btn-sm" id="tranCustomerBtn"><i class="fa fa-exchange"></i> 转交他人</button>
                         <button class="btn bg-maroon btn-sm" id="publicCustomerBtn"><i class="fa fa-recycle"></i> 放入公海</button>
