@@ -182,6 +182,12 @@ public class TaskServiceImpl implements TaskService {
         }
     }
 
+    /**
+     * 创建定时任务
+     * @param task
+     * @param accountId
+     * @param remindTime
+     */
     private void createQuartz(Task task, Integer accountId, String remindTime) {
         JobDataMap dataMap = new JobDataMap();
         dataMap.putAsString("accountId",accountId);

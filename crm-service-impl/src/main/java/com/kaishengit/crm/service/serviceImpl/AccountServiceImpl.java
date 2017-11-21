@@ -145,11 +145,13 @@ public class AccountServiceImpl implements AccountService {
         accountDeptMapper.deleteByExample(accountDeptExample);
 
         accountMapper.deleteByPrimaryKey(id);
+        logger.info("删除员工:{}", id);
+
+        weixinUtil.deleteAccount(id);
     }
 
     /**
      * 查找所有账号列表
-     *
      * @return
      */
     @Override

@@ -75,6 +75,11 @@ public class WeixinUtil {
                 }
             });
 
+    /**
+     * 发送文本消息
+     * @param userIdList
+     * @param message
+     */
     public void sendTextMessage(List<String> userIdList, String message) {
         String accessToken = getAccessToken(ACCESS_TOKEN_TYPE_NORMAL);
         String url = String.format(POST_TEXT_MESSAGE_URL, accessToken);
