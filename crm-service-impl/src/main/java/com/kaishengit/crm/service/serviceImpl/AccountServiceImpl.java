@@ -8,6 +8,7 @@ import com.kaishengit.crm.service.exception.ServiceException;
 import com.kaishengit.crm.mapper.AccountDeptMapper;
 import com.kaishengit.crm.mapper.AccountMapper;
 import com.kaishengit.crm.service.AccountService;
+import com.kaishengit.weixin.util.WeixinUtil;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -33,9 +35,10 @@ public class AccountServiceImpl implements AccountService {
 
     @Autowired
     private AccountMapper accountMapper;
-
     @Autowired
     private AccountDeptMapper accountDeptMapper;
+    @Autowired
+    private WeixinUtil weixinUtil;
 
     /**
      * 用户登录系统的方法
@@ -54,25 +57,6 @@ public class AccountServiceImpl implements AccountService {
         } else {
             throw new ServiceException("账号或密码错误");
         }
-    }
-
-    /**
-     * 保存新账号和该账号所在部门
-     * @param account 新用户
-     * @param deptId  该用户所在部门id
-     */
-    @Override
-    public void save(Account account, Integer deptId) {
-        account.setCreateTime(new Timestamp(System.currentTimeMillis()));
-        account.setPassword(DigestUtils.md5Hex(account.getPassword()));
-
-        accountMapper.insertSelective(account);
-
-        AccountDeptKey accountDeptKey = new AccountDeptKey();
-        accountDeptKey.setUserId(account.getId());
-        accountDeptKey.setDeptId(deptId);
-        accountDeptMapper.insertSelective(accountDeptKey);
-
     }
 
     /**
@@ -134,6 +118,9 @@ public class AccountServiceImpl implements AccountService {
         account.setUpdateTime(new Timestamp(System.currentTimeMillis()));
 
         accountMapper.insertSelective(account);
+        logger.info("添加新账号:{}", userName + " " + mobile);
+
+        weixinUtil.createAccount(account.getId(),userName, mobile, Arrays.asList(deptIds));
 
         for (Integer deptId : deptIds) {
             AccountDeptKey accountDeptKey = new AccountDeptKey();

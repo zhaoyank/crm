@@ -20,14 +20,6 @@ public interface AccountService {
      */
     Account login(String mobile, String password);
 
-
-    /**
-     * 保存新账号和该账号所在部门
-     * @param account 新用户
-     * @param deptId 该用户所在部门id
-     */
-    void save(Account account, Integer deptId);
-
     /**
      * 根据查询条件获得account集合
      * @param queryParam

@@ -99,13 +99,13 @@
             <include refid="Example_Where_Clause"/>
         </if>
     </delete>
-    <insert id="insert" parameterType="com.kaishengit.crm.entity.Dept">
-    insert into dept (id, dept_name, pid
-      )
-    values (#{id,jdbcType=INTEGER}, #{deptName,jdbcType=VARCHAR}, #{pid,jdbcType=INTEGER}
-      )
-  </insert>
-    <insert id="insertSelective" parameterType="com.kaishengit.crm.entity.Dept">
+    <insert id="insert" parameterType="com.kaishengit.crm.entity.Dept" useGeneratedKeys="true" keyProperty="id">
+        insert into dept (id, dept_name, pid
+          )
+        values (#{id,jdbcType=INTEGER}, #{deptName,jdbcType=VARCHAR}, #{pid,jdbcType=INTEGER}
+          )
+     </insert>
+    <insert id="insertSelective" parameterType="com.kaishengit.crm.entity.Dept" useGeneratedKeys="true" keyProperty="id">
         insert into dept
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">

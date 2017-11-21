@@ -100,10 +100,10 @@
                                 </td>
                                 <td class="file_detail" rel="${file.id}">
                                     ${file.fileName}
-                                    <span class="tools pull-right">
+                                    <%--<span class="tools pull-right">
                                         <i class="fa fa-edit"></i>
                                         <i class="fa fa-trash-o"></i>
-                                    </span>
+                                    </span>--%>
                                 </td>
                                 <td colspan="2">
                                     <c:choose>
