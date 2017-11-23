@@ -316,6 +316,7 @@
                 }
             },
             legend: {
+                bottom: 10,
                 data: []
             },
             calculable: true,

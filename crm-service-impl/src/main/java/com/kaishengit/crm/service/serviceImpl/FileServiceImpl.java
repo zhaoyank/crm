@@ -26,6 +26,9 @@ public class FileServiceImpl implements FileService {
     @Autowired
     private FileMapper fileMapper;
 
+    /**
+     * 上传和下载文件的接口
+     */
     @Autowired
     @Qualifier("qiNiuCloudFileStore")
     private FileStore fileStore;
@@ -147,6 +150,7 @@ public class FileServiceImpl implements FileService {
         file.setFileName(fileName);
         file.setFileSize(FileUtils.byteCountToDisplaySize(fileSize));
         file.setSaveName(saveName);
+
         fileMapper.insertSelective(file);
     }
 }

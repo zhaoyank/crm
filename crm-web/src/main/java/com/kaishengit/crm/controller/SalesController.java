@@ -1,14 +1,13 @@
 package com.kaishengit.crm.controller;
 
-import com.kaishengit.crm.entity.Account;
-import com.kaishengit.crm.entity.Customer;
-import com.kaishengit.crm.entity.SaleChance;
-import com.kaishengit.crm.entity.SaleChanceProgress;
+import com.kaishengit.crm.entity.*;
 import com.kaishengit.crm.service.CustomerService;
 import com.kaishengit.crm.service.SaleChanceProgressService;
 import com.kaishengit.crm.service.SaleChanceService;
+import com.kaishengit.crm.service.TaskService;
 import com.kaishengit.crm.web.exception.ForbiddenException;
 import com.kaishengit.crm.web.exception.NotFoundException;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,6 +18,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpSession;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -30,12 +32,12 @@ public class SalesController extends BaseController {
 
     @Autowired
     private SaleChanceService saleChanceService;
-
     @Autowired
     private SaleChanceProgressService saleChanceProgressService;
-
     @Autowired
     private CustomerService customerService;
+    @Autowired
+    private TaskService taskService;
 
     @GetMapping("/my")
     public String mySales(Model model, HttpSession session) {
@@ -62,13 +64,17 @@ public class SalesController extends BaseController {
     public String showChance(@PathVariable Integer saleChanceId,
                              HttpSession session,
                              Model model) {
+        Account account = getCurrentAccount(session);
         SaleChance saleChance = permissions(session , saleChanceId);
+
         Customer customer = customerService.findCustomerById(saleChance.getCustId());
         List<SaleChanceProgress> progressList = saleChanceProgressService.findProgressBySaleId(saleChanceId);
+        List<Task> taskList = taskService.findTaskByAccountAndSaleId(account.getId(),saleChanceId);
 
         model.addAttribute("saleChance", saleChance);
         model.addAttribute("customer", customer);
         model.addAttribute("progressList",progressList);
+        model.addAttribute("taskList", taskList);
         return "record/show";
     }
 
@@ -98,6 +104,23 @@ public class SalesController extends BaseController {
         return "redirect:/sales/my";
     }
 
+    @PostMapping("/new/task")
+    public String newTask(Integer accountId,
+                          String title,
+                          String finishTime,
+                          String remindTime,
+                          Integer saleId) throws ParseException {
+
+        taskService.saveNewTask(accountId,title,finishTime, remindTime, saleId, null);
+        return "redirect:/sales/my/" + saleId;
+    }
+
+    /**
+     * 判断客户是否存在 && 判断用户权限
+     * @param session
+     * @param id
+     * @return
+     */
     private SaleChance permissions(HttpSession session, Integer id) {
         Account account = getCurrentAccount(session);
         SaleChance saleChance = saleChanceService.findSaleChanceById(id);

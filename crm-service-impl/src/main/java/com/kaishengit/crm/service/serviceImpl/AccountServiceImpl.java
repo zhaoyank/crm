@@ -1,9 +1,8 @@
 package com.kaishengit.crm.service.serviceImpl;
 
-import com.kaishengit.crm.entity.Account;
-import com.kaishengit.crm.entity.AccountDeptExample;
-import com.kaishengit.crm.entity.AccountDeptKey;
-import com.kaishengit.crm.entity.AccountExample;
+import com.kaishengit.crm.entity.*;
+import com.kaishengit.crm.mapper.CustomerMapper;
+import com.kaishengit.crm.mapper.SaleChanceMapper;
 import com.kaishengit.crm.service.exception.ServiceException;
 import com.kaishengit.crm.mapper.AccountDeptMapper;
 import com.kaishengit.crm.mapper.AccountMapper;
@@ -37,6 +36,10 @@ public class AccountServiceImpl implements AccountService {
     private AccountMapper accountMapper;
     @Autowired
     private AccountDeptMapper accountDeptMapper;
+    @Autowired
+    private SaleChanceMapper saleChanceMapper;
+    @Autowired
+    private CustomerMapper customerMapper;
     @Autowired
     private WeixinUtil weixinUtil;
 
@@ -131,15 +134,34 @@ public class AccountServiceImpl implements AccountService {
     }
 
     /**
-     * 根据id删除员工
-     * @param id
-     * @throws ServiceException 当该员工下有业务时,抛出该异常
+     * 根据id删除账号
+     * @param id 账号ID
+     * @throws ServiceException 当该账号有业务时,抛出该异常
      */
     @Override
     @Transactional(rollbackFor = ServiceException.class)
     public void deleteEmployeeById(Integer id) throws ServiceException {
-        // TODO : 其他业务判断
+        // 判断名下是否有客户
+        CustomerExample customerExample = new CustomerExample();
+        customerExample.createCriteria().andAccountIdEqualTo(id);
+        List<Customer> customerList = customerMapper.selectByExample(customerExample);
+        if (!customerList.isEmpty()) {
+            throw new ServiceException("该员工下还有客户,无法删除");
+        }
+        //判断名下是否有销售机会未完成
+        SaleChanceExample saleChanceExample = new SaleChanceExample();
+        saleChanceExample.createCriteria().andAccountIdEqualTo(id);
+        List<SaleChance> saleChanceList = saleChanceMapper.selectByExample(saleChanceExample);
 
+        if (!saleChanceList.isEmpty()) {
+            for(SaleChance saleChance: saleChanceList) {
+                if (!saleChance.getProgress().equals("成交")) {
+                    throw new ServiceException("该员工下还有销售业务未完成,无法删除");
+                }
+            }
+        }
+
+        //删除账号
         AccountDeptExample accountDeptExample = new AccountDeptExample();
         accountDeptExample.createCriteria().andUserIdEqualTo(id);
         accountDeptMapper.deleteByExample(accountDeptExample);

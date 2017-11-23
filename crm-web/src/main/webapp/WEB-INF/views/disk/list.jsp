@@ -294,6 +294,7 @@
         //上传成功
         uploader.on('uploadSuccess',function (file,data) {
             console.log(file);
+            console.log(data);
             $.get("/disk/upload/cloud",{'saveName':data.key,'fileName':file.name,'size':file.size,'pId':pId}).done(function (resp) {
                 if (resp.state == "success") {
                     appendTr(resp);

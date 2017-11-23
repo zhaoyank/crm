@@ -67,7 +67,6 @@ public class EmployeeController {
         queryParam.put("keyword",keyword);
         queryParam.put("deptId",deptId);
 
-        System.out.println(deptId);
 
         List<Account> list = accountService.findEmployeeListWithParam(queryParam);
 

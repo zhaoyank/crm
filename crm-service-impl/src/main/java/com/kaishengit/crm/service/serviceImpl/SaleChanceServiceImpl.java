@@ -46,17 +46,20 @@ public class SaleChanceServiceImpl implements SaleChanceService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void saveNewChance(SaleChance saleChance, Account account) {
+        // 保存新的销售机会
         saleChance.setAccountId(account.getId());
         saleChance.setCreateTime(new Date());
         saleChance.setLastTime(new Date());
         saleChanceMapper.insertSelective(saleChance);
 
+        // 第一次保存时, 跟进保存销售机会进度
         SaleChanceProgress saleChanceProgress = new SaleChanceProgress();
         saleChanceProgress.setContent("将当前进度修改为 [" + saleChance.getProgress() + "]");
         saleChanceProgress.setSaleId(saleChance.getId());
         saleChanceProgress.setCreateTime(new Date());
         saleChanceProgressMapper.insertSelective(saleChanceProgress);
 
+        // 修改客户的最后跟进时间
         Customer customer = customerMapper.selectByPrimaryKey(saleChance.getCustId());
         customer.setLastContactTime(new Date());
         customerMapper.updateByPrimaryKeySelective(customer);
@@ -80,14 +83,17 @@ public class SaleChanceServiceImpl implements SaleChanceService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateSaleChanceProgress(SaleChance saleChance, String progress) {
+        // 更新销售机会的更新时间
         saleChance.setLastTime(new Date());
         saleChance.setProgress(progress);
         saleChanceMapper.updateByPrimaryKeySelective(saleChance);
 
+        // 更新客户最后跟进时间
         Customer customer = customerMapper.selectByPrimaryKey(saleChance.getCustId());
         customer.setLastContactTime(new Date());
         customerMapper.updateByPrimaryKeySelective(customer);
 
+        // 更新销售机会进度
         SaleChanceProgress saleChanceProgress = new SaleChanceProgress();
         saleChanceProgress.setCreateTime(new Date());
         saleChanceProgress.setContent("将当前进度修改为: [" + progress + "]");
@@ -97,8 +103,6 @@ public class SaleChanceServiceImpl implements SaleChanceService {
 
     /**
      * 根据主键删除销售机会
-     * 删除此销售机会的进度信息
-     * 更改此客户最后跟进时间
      * @param id
      */
     @Override
@@ -106,13 +110,16 @@ public class SaleChanceServiceImpl implements SaleChanceService {
     public void deleteSalesChanceById(Integer id) {
         SaleChance saleChance = saleChanceMapper.selectByPrimaryKey(id);
 
+        // 删除此销售机会的进度信息
         SaleChanceProgressExample recordExample = new SaleChanceProgressExample();
         recordExample.createCriteria().andSaleIdEqualTo(id);
-
         saleChanceProgressMapper.deleteByExample(recordExample);
 
+        // 删除销售机会
         saleChanceMapper.deleteByPrimaryKey(id);
 
+        // 更改此客户最后跟进时间
+        // 获得之前最近一次的跟进时间
         SaleChanceExample example = new SaleChanceExample();
         example.createCriteria().andCustIdEqualTo(saleChance.getCustId());
         example.setOrderByClause("last_time desc");

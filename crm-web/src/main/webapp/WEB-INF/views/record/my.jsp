@@ -68,8 +68,18 @@
                                 <tr class="dataRow" rel="${sale.id}">
                                     <td>${sale.name}</td>
                                     <td>${sale.custName}</td>
-                                    <td><fmt:formatNumber value="${sale.worth}"/> </td>
-                                    <td>${sale.progress}</td>
+                                    <td>￥ <fmt:formatNumber value="${sale.worth}"/> </td>
+                                    <c:choose>
+                                        <c:when test="${sale.progress == '成交'}">
+                                            <td><span class="text-success"><i class="fa fa-check"></i>${sale.progress}</span></td>
+                                        </c:when>
+                                        <c:when test="${sale.progress == '暂时搁置'}">
+                                            <td><span class="text-danger"><i class="fa fa-close"></i>${sale.progress}</span></td>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <td>${sale.progress}</td>
+                                        </c:otherwise>
+                                    </c:choose>
                                     <td><fmt:formatDate value="${sale.lastTime}" type="both"/></td>
                                 </tr>
                             </c:forEach>
@@ -148,7 +158,8 @@
 <script>
     $(function () {
 
-        /*var num_cn = ['零','壹','贰','叁','肆','伍','陆','柒','捌','玖'];
+        var num_cn = ['零','壹','贰','叁','肆','伍','陆','柒','捌','玖'];
+        var digits_cn = ['','十','百','千','万'];
 
         $("#worthInput").keyup(function () {
             list = [];
@@ -156,7 +167,7 @@
             var array = tranWorth(worth);
             var str = '';
             for(var i = 0; i < array.length; i ++) {
-                str += num_cn[array[i]];
+                str += array[i] ;
             }
             console.log(str);
         });
@@ -168,15 +179,15 @@
                 var yu = n % 10;
                 if(n > 10) {
                     n = parseInt(n / 10);
-                    list.unshift(yu);
+                    list.unshift(num_cn[yu]);
                     tranWorth(n);
                 } else {
-                    list.unshift(n);
+                    list.unshift(num_cn[n]);
                     return list;
                 }
             }
 
-        }*/
+        }
 
 
         $(function () {

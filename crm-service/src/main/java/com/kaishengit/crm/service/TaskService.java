@@ -19,17 +19,14 @@ public interface TaskService {
 
     /**
      * 保存计划任务
-     * @param task
-     */
-    void saveNewTask(Task task);
-
-    /**
-     * 保存计划任务
      * @param accountId
+     * @param title
      * @param finishTime
      * @param remindTime
+     * @param saleId
+     * @param custId
      */
-    void saveNewTask(Integer accountId, String title, String finishTime, String remindTime) throws ParseException;
+    void saveNewTask(Integer accountId, String title, String finishTime, String remindTime, Integer saleId, Integer custId) throws ParseException;
 
     /**
      * 根据id删除待办事项
@@ -59,4 +56,13 @@ public interface TaskService {
      * @param remindTime
      */
     void editTask(Integer id, Integer accountId, String title, String finishTime, String remindTime) throws ParseException;
+
+    /**
+     * 根据用户ID和销售机会ID查找所有计划任务
+     * @param accountId
+     * @param saleId
+     * @return
+     */
+    List<Task> findTaskByAccountAndSaleId(Integer accountId, Integer saleId);
+
 }

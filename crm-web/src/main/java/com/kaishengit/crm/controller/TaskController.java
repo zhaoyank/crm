@@ -6,6 +6,7 @@ import com.kaishengit.crm.service.TaskService;
 import com.kaishengit.crm.web.exception.ForbiddenException;
 import com.kaishengit.crm.web.exception.NotFoundException;
 import com.kaishengit.util.JsonResult;
+import com.qiniu.util.Json;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,11 +30,19 @@ public class TaskController extends BaseController {
 
     @GetMapping
     public String myTask(Model model,HttpSession session) {
-        Account account = getCurrentAccount(session);
+        /*Account account = getCurrentAccount(session);
         List<Task> taskList = taskService.findAllTaskByAccountId(account.getId());
 
-        model.addAttribute("taskList", taskList);
+        model.addAttribute("taskList", taskList);*/
         return "task/task";
+    }
+
+    @GetMapping("/list.json")
+    @ResponseBody
+    public JsonResult list(HttpSession session) {
+        Account account = getCurrentAccount(session);
+        List<Task> taskList = taskService.findAllTaskByAccountId(account.getId());
+        return JsonResult.success(taskList);
     }
 
     @PostMapping("/new")
@@ -44,7 +53,7 @@ public class TaskController extends BaseController {
                               RedirectAttributes redirectAttributes) {
 
         try {
-            taskService.saveNewTask(accountId, title, finishTime, remindTime);
+            taskService.saveNewTask(accountId, title, finishTime, remindTime, null, null);
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -53,24 +62,27 @@ public class TaskController extends BaseController {
     }
 
     @GetMapping("/{id:\\d+}/delete")
-    public String deleteTask(@PathVariable Integer id, HttpSession session) {
+    @ResponseBody
+    public JsonResult deleteTask(@PathVariable Integer id, HttpSession session) {
         permissions(session, id);
         taskService.deleteTaskById(id);
-        return "redirect:/task";
+        return JsonResult.success();
     }
 
     @GetMapping("/{id:\\d+}/state/done")
-    public String done(@PathVariable Integer id, HttpSession session) {
+    @ResponseBody
+    public JsonResult done(@PathVariable Integer id, HttpSession session) {
         permissions(session, id);
         taskService.updateTaskState(id);
-        return "redirect:/task";
+        return JsonResult.success();
     }
 
     @GetMapping("/{id:\\d+}/state/undone")
-    public String undone(@PathVariable Integer id, HttpSession session) {
+    @ResponseBody
+    public JsonResult undone(@PathVariable Integer id, HttpSession session) {
         permissions(session, id);
         taskService.updateTaskState(id);
-        return "redirect:/task";
+        return JsonResult.success();
     }
 
     @GetMapping("/{id:\\d+}/task.json")
