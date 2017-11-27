@@ -76,4 +76,9 @@ public class DeptServiceImpl implements DeptService {
 
         weixinUtil.deleteDept(deptId);
     }
+
+    @Override
+    public List<Dept> findByUserId(Integer userId) {
+        return deptMapper.findDeptsByAccontId(userId);
+    }
 }

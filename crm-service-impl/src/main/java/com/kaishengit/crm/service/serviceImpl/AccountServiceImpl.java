@@ -1,11 +1,8 @@
 package com.kaishengit.crm.service.serviceImpl;
 
 import com.kaishengit.crm.entity.*;
-import com.kaishengit.crm.mapper.CustomerMapper;
-import com.kaishengit.crm.mapper.SaleChanceMapper;
+import com.kaishengit.crm.mapper.*;
 import com.kaishengit.crm.service.exception.ServiceException;
-import com.kaishengit.crm.mapper.AccountDeptMapper;
-import com.kaishengit.crm.mapper.AccountMapper;
 import com.kaishengit.crm.service.AccountService;
 import com.kaishengit.weixin.util.WeixinUtil;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -42,6 +39,8 @@ public class AccountServiceImpl implements AccountService {
     private CustomerMapper customerMapper;
     @Autowired
     private WeixinUtil weixinUtil;
+    @Autowired
+    private DeptMapper deptMapper;
 
     /**
      * 用户登录系统的方法
@@ -179,6 +178,28 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public List<Account> findAllAccount() {
         return accountMapper.selectByExample(new AccountExample());
+    }
+
+    /**
+     * 根据mobile查找对应Account对象
+     * @param mobile
+     * @return
+     */
+    @Override
+    public Account findAccountByMobile(String mobile) {
+        AccountExample accountExample = new AccountExample();
+        accountExample.createCriteria().andMobileEqualTo(mobile);
+
+        List<Account> accountList = accountMapper.selectByExample(accountExample);
+        if (accountList != null && !accountList.isEmpty()) {
+            return accountList.get(0);
+        }
+        return null;
+    }
+
+    @Override
+    public List<Dept> findDeptsById(Integer id) {
+        return deptMapper.findDeptsByAccontId(id);
     }
 
 

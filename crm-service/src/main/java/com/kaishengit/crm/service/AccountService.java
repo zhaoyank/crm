@@ -1,6 +1,7 @@
 package com.kaishengit.crm.service;
 
 import com.kaishengit.crm.entity.Account;
+import com.kaishengit.crm.entity.Dept;
 import com.kaishengit.crm.service.exception.ServiceException;
 
 import java.util.List;
@@ -56,4 +57,18 @@ public interface AccountService {
      * @return
      */
     List<Account> findAllAccount();
+
+    /**
+     * 根据mobile查找对应Account对象
+     * @param mobile
+     * @return
+     */
+    Account findAccountByMobile(String mobile);
+
+    /**
+     * 根据id获取Account对象的部门列表
+     * @param id
+     * @return
+     */
+    List<Dept> findDeptsById(Integer id);
 }

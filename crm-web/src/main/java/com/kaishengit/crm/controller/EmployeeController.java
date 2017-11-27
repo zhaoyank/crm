@@ -5,6 +5,7 @@ import com.kaishengit.crm.service.AccountService;
 import com.kaishengit.crm.service.exception.ServiceException;
 import com.kaishengit.util.DataTableResult;
 import com.kaishengit.util.JsonResult;
+import com.kaishengit.weixin.exception.WeixinException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -38,6 +39,8 @@ public class EmployeeController {
             return JsonResult.success();
         } catch (ServiceException ex) {
             ex.printStackTrace();
+            return JsonResult.error(ex.getMessage());
+        } catch (WeixinException ex) {
             return JsonResult.error(ex.getMessage());
         }
     }

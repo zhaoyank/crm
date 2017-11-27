@@ -10,6 +10,7 @@
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     
     <%@include file="include/css.jsp"%>
+    <link rel="stylesheet" href="/static/plugins/iCheck/square/blue.css">
     
 </head>
 <body class="hold-transition login-page">
@@ -37,7 +38,7 @@
                 <div class="col-xs-8">
                     <div class="checkbox icheck">
                         <label>
-                            <a href="#">忘记密码</a><br>
+                            <input type="checkbox" name="rememberMe"> 记住我
                         </label>
                     </div>
                 </div>
@@ -59,5 +60,15 @@
 <script src="/static/plugins/jQuery/jquery-2.2.3.min.js"></script>
 <!-- Bootstrap 3.3.6 -->
 <script src="/static/bootstrap/js/bootstrap.min.js"></script>
+<script src="/static/plugins/iCheck/icheck.min.js"></script>
+<script>
+    $(function () {
+        $('input').iCheck({
+            checkboxClass: 'icheckbox_square-blue',
+            radioClass: 'iradio_square-blue',
+            increaseArea: '20%' // optional
+        });
+    });
+</script>
 </body>
 </html>

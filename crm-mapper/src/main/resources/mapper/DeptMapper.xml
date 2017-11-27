@@ -148,6 +148,16 @@
             dept.id = #{deptId}
     </select>
 
+    <select id="findDeptsByAccontId" resultType="com.kaishengit.crm.entity.Dept">
+        SELECT
+          *
+        FROM
+            dept
+        INNER JOIN account_dept ON dept.id = account_dept.dept_id
+        WHERE
+            account_dept.user_id = #{accountId}
+    </select>
+
     <update id="updateByExampleSelective" parameterType="map">
         update dept
         <set>

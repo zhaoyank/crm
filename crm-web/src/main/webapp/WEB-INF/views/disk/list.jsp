@@ -67,7 +67,6 @@
 
     <!-- 右侧内容部分 -->
     <div class="content-wrapper">
-
         <!-- Main content -->
         <section class="content">
 
@@ -157,7 +156,7 @@
                                                 <li><a href="/disk/download?_=${file.id}">下载</a></li>
                                             </c:if>
                                             <li><a class="reNameLink" rel="${file.id}" href="javascript:;">重命名</a></li>
-                                            <li><a href="#">删除</a></li>
+                                            <li><a class="deleteLink" rel="${file.id}" href="javascript:;">删除</a></li>
                                         </ul>
                                     </div>
                                 </td>
@@ -207,7 +206,7 @@
                     <li><a href="/disk/download?_=${file.id}">下载</a></li>
                     <? } ?>
                     <li><a class="reNameLink" rel="${file.id}" href="javascript:;">重命名</a></li>
-                    <li><a href="#">删除</a></li>
+                    <li><a class="deleteLink" rel="${file.id}" href="javascript:;">删除</a></li>
                 </ul>
             </div>
         </td>
@@ -217,17 +216,76 @@
 <script>
     $(function () {
         var pId = ${not empty requestScope.file ? requestScope.file.id : '0'};
-        var accountId = ${sessionScope.curr_account.id};
+        var accountId = ${requestScope.accountId};
         var upToken = '${requestScope.upToken}';
 
+        /*<!-- 验证密码 -->
+        var validatePassword = function (id, password) {
+            $.get("/disk/validate",{'id':id, 'password':password}).done(function (resp) {
+                if(resp.state == 'success') {
+                    return true;
+                } else {
+                    layer.msg(resp.message);
+                }
+            }).error(function () {
+                layer.msg("系统异常");
+            });
+        };*/
 
         <!--重命名-->
         $(document).delegate(".reNameLink","click",function () {
-            layer.prompt({title:"请输入新的文件名"},function (fileName,index) {
-
+            var id = $(this).attr("rel");
+            layer.prompt({title:"此操作需要输入密码",formType:1},function (password,index1) {
+                $.get("/disk/validate",{'id':id, 'password':password}).done(function (resp) {
+                    if(resp.state == 'success') {
+                        layer.close(index1);
+                        layer.prompt({title:'请输入新文件名'},function (fileName, index2) {
+                            $.post("/disk/update",{'id':id,'fileName':fileName,'pId':pId}).done(function (resp) {
+                                if (resp.state == 'success') {
+                                    layer.close(index2);
+                                    layer.msg("修改成功");
+                                    appendTr(resp);
+                                } else {
+                                    layer.msg(resp.message);
+                                }
+                            }).error(function () {
+                                layer.msg("系统异常");
+                            });
+                        });
+                    } else {
+                        layer.msg(resp.message);
+                    }
+                }).error(function () {
+                    layer.msg("系统异常");
+                });
             });
         });
 
+        <!--删除-->
+        $(document).delegate(".deleteLink","click",function () {
+            var id = $(this).attr("rel");
+            layer.prompt({title:"此操作需要输入密码",formType:1},function (password,index1) {
+                $.get("/disk/validate",{'id':id, 'password':password}).done(function (resp) {
+                    if(resp.state == 'success') {
+                        layer.close(index1);
+                        $.get("/disk/delete",{'id':id,'pId':pId}).done(function (resp) {
+                            if(resp.state == 'success') {
+                                layer.msg('删除成功');
+                                appendTr(resp);
+                            } else {
+                                layer.msg(resp.message);
+                            }
+                        }).error(function () {
+                            layer.msg("系统异常");
+                        });
+                    } else {
+                        layer.msg(resp.message);
+                    }
+                }).error(function () {
+                    layer.msg("系统异常");
+                });
+            });
+        });
         <!--拼接 tr-->
         var appendTr = function (data) {
             $("#dataTable").html("");
@@ -293,8 +351,6 @@
         });
         //上传成功
         uploader.on('uploadSuccess',function (file,data) {
-            console.log(file);
-            console.log(data);
             $.get("/disk/upload/cloud",{'saveName':data.key,'fileName':file.name,'size':file.size,'pId':pId}).done(function (resp) {
                 if (resp.state == "success") {
                     appendTr(resp);

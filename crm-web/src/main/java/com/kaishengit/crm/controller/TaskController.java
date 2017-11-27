@@ -29,18 +29,14 @@ public class TaskController extends BaseController {
     private TaskService taskService;
 
     @GetMapping
-    public String myTask(Model model,HttpSession session) {
-        /*Account account = getCurrentAccount(session);
-        List<Task> taskList = taskService.findAllTaskByAccountId(account.getId());
-
-        model.addAttribute("taskList", taskList);*/
+    public String myTask() {
         return "task/task";
     }
 
     @GetMapping("/list.json")
     @ResponseBody
-    public JsonResult list(HttpSession session) {
-        Account account = getCurrentAccount(session);
+    public JsonResult list() {
+        Account account = getCurrentAccount();
         List<Task> taskList = taskService.findAllTaskByAccountId(account.getId());
         return JsonResult.success(taskList);
     }
@@ -63,24 +59,24 @@ public class TaskController extends BaseController {
 
     @GetMapping("/{id:\\d+}/delete")
     @ResponseBody
-    public JsonResult deleteTask(@PathVariable Integer id, HttpSession session) {
-        permissions(session, id);
+    public JsonResult deleteTask(@PathVariable Integer id) {
+        permissions(id);
         taskService.deleteTaskById(id);
         return JsonResult.success();
     }
 
     @GetMapping("/{id:\\d+}/state/done")
     @ResponseBody
-    public JsonResult done(@PathVariable Integer id, HttpSession session) {
-        permissions(session, id);
+    public JsonResult done(@PathVariable Integer id) {
+        permissions(id);
         taskService.updateTaskState(id);
         return JsonResult.success();
     }
 
     @GetMapping("/{id:\\d+}/state/undone")
     @ResponseBody
-    public JsonResult undone(@PathVariable Integer id, HttpSession session) {
-        permissions(session, id);
+    public JsonResult undone(@PathVariable Integer id) {
+        permissions(id);
         taskService.updateTaskState(id);
         return JsonResult.success();
     }
@@ -108,8 +104,8 @@ public class TaskController extends BaseController {
     }
 
 
-    private Task permissions(HttpSession session, Integer id) {
-        Account account = getCurrentAccount(session);
+    private Task permissions(Integer id) {
+        Account account = getCurrentAccount();
         Task task = taskService.findTaskById(id);
         if(task == null) {
             throw new NotFoundException();

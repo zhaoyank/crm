@@ -65,4 +65,11 @@ public interface TaskService {
      */
     List<Task> findTaskByAccountAndSaleId(Integer accountId, Integer saleId);
 
+    /**
+     * 根据顾客Id查询所有计划任务
+     * @param accountId
+     * @param custId
+     * @return
+     */
+    List<Task> findTasByCustId(Integer accountId, Integer custId);
 }

@@ -29,4 +29,6 @@ public interface DeptService {
      * @throws ServiceException 如果该部门下有员工,则抛出该异常
      */
     void deleteDeptById(Integer deptId) throws ServiceException;
+
+    List<Dept> findByUserId(Integer userId);
 }

@@ -7,9 +7,11 @@ import com.kaishengit.crm.service.exception.ServiceException;
 import com.kaishengit.crm.web.exception.NotFoundException;
 import com.kaishengit.util.JsonResult;
 import com.qiniu.util.Auth;
+import com.qiniu.util.Json;
 import com.qiniu.util.StringMap;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.crypto.hash.Md5Hash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -52,6 +54,7 @@ public class FileController extends BaseController {
         Auth auth = Auth.create(accessKey, secretKey);
         String upToken = auth.uploadToken(bucketName);
 
+        model.addAttribute("accountId", getCurrentAccount().getId());
         model.addAttribute("upToken", upToken);
         model.addAttribute("fileList",fileList);
         return "disk/list";
@@ -68,6 +71,11 @@ public class FileController extends BaseController {
     @ResponseBody
     public JsonResult createNewDir(File file) {
         try {
+            // 设置密码
+            Account account = getCurrentAccount();
+            String password = account.getPassword();
+            file.setPassword(new Md5Hash(password).toString());
+
             fileService.saveNewDir(file);
             List<File> fileList = fileService.findFileListByPId(file.getpId());
             return JsonResult.success(fileList);
@@ -100,11 +108,11 @@ public class FileController extends BaseController {
 
     @GetMapping("/upload/cloud")
     @ResponseBody
-    public JsonResult uploadToCloud(String saveName, String size, String fileName, Integer pId, HttpSession session) throws IOException {
-        Account account = getCurrentAccount(session);
+    public JsonResult uploadToCloud(String saveName, String size, String fileName, Integer pId) throws IOException {
+        Account account = getCurrentAccount();
         Long fileSize = Long.parseLong(size);
 
-        fileService.uploadFileToDB(pId, account.getId(),saveName, fileName, fileSize);
+        fileService.uploadFileToDB(pId, account.getId(),saveName, fileName, fileSize, (new Md5Hash(account.getPassword()).toString()));
 
         List<File> fileList = fileService.findFileListByPId(pId);
         return JsonResult.success(fileList);
@@ -135,6 +143,43 @@ public class FileController extends BaseController {
             ex.printStackTrace();
             throw new NotFoundException();
         }
+    }
+
+    @GetMapping("/validate")
+    @ResponseBody
+    public JsonResult validatePassword(Integer id, String password) {
+        try {
+            fileService.validatePassword(id, password);
+            return JsonResult.success();
+        } catch (ServiceException ex) {
+            return JsonResult.error(ex.getMessage());
+        }
+    }
+
+    @PostMapping("/update")
+    @ResponseBody
+    public JsonResult updateFile(File file) {
+        try {
+            fileService.updateFileById(file);
+            List<File> fileList = fileService.findFileListByPId(file.getpId());
+            return JsonResult.success(fileList);
+        } catch (ServiceException ex) {
+            ex.printStackTrace();
+            return JsonResult.error(ex.getMessage());
+        }
+    }
+
+    @GetMapping("/delete")
+    @ResponseBody
+    public JsonResult deleteFile(Integer id, Integer pId) {
+        try {
+            fileService.deleteById(id);
+        } catch (ServiceException ex) {
+            ex.printStackTrace();
+            return JsonResult.error(ex.getMessage());
+        }
+        List<File> fileList = fileService.findFileListByPId(pId);
+        return JsonResult.success(fileList);
     }
 
 }

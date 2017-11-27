@@ -1,4 +1,5 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8" %>
 <!-- 左侧菜单栏 -->
@@ -48,17 +49,17 @@
                     <li><a href="/task/past"><i class="fa fa-circle-o"></i> ...</a></li>
                 </ul>
             </li>
-
-
             <li class="${param.menu == "file"? "active" : ""}"><a href="/disk"><i class="fa fa-share-alt"></i> <span>公司网盘</span></a></li>
+
+            <shiro:hasRole name="人事管理部">
             <li class="header">系统管理</li>
             <!-- 部门员工管理 -->
             <li class="treeview ${param.menu == "employee" ? "active" : ""}">
                 <a href="/employee">
                     <i class="fa fa-users"></i> <span>员工管理</span>
                 </a>
-
             </li>
+            </shiro:hasRole>
         </ul>
     </section>
     <!-- /.sidebar -->

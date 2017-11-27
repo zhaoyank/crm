@@ -12,3 +12,15 @@
 <script src="/static/dist/js/app.min.js"></script>
 <!-- layer -->
 <script src="/static/plugins/layer/layer.js"></script>
+<script>
+    $(function () {
+       $.get("/deptNames.json").done(function (resp) {
+           if(resp.state == "success") {
+               console.log(resp.data);
+               $("#deptNames").text(resp.data);
+           }
+       }).error(function () {
+           layer.msg("获取账号部门失败");
+       });
+    });
+</script>

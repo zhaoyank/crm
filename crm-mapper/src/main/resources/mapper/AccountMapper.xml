@@ -223,7 +223,6 @@
         </if>
     </select>
 
-
     <update id="updateByExampleSelective" parameterType="map">
         update account
         <set>

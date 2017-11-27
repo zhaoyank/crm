@@ -263,7 +263,7 @@
                 <div class="modal-body">
                     <form id="addTaskForm" action="/sales/new/task" method="post">
                         <div class="form-group">
-                            <input type="hidden" name="accountId" value="${sessionScope.curr_account.id}">
+                            <input type="hidden" name="accountId" value="${requestScope.accountId}">
                             <input type="hidden" name="saleId" value="${saleChance.id}">
                             <label>任务名称</label>
                             <input type="text" name="title" class="form-control">
@@ -293,6 +293,7 @@
 <script src="/static/plugins/validate/jquery.validate.min.js"></script>
 <script src="/static/plugins/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
 <script src="/static/plugins/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+<script src="/static/plugins/moment/moment.js"></script>
 <script src="/static/plugins/datepicker/bootstrap-datepicker.js"></script>
 <script src="/static/plugins/datepicker/locales/bootstrap-datepicker.zh-CN.js"></script>
 <script>

@@ -10,12 +10,16 @@
     <title>凯盛软件CRM-客户资料</title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+
     <%@include file="../include/css.jsp"%>
+    <link rel="stylesheet" href="/static/dist/css/skins/_all-skins.min.css">
+    <link rel="stylesheet" href="/static/plugins/datetimepicker/css/bootstrap-datetimepicker.min.css">
+    <link rel="stylesheet" href="/static/plugins/datepicker/datepicker3.css">
     <style>
         .td_title {
             font-weight: bold;
         }
-        .form-control {
+        .edit {
             border : none;
         }
         .form-control[disabled], .form-control[readonly], fieldset[disabled] .form-control {
@@ -64,16 +68,16 @@
                     <table class="table">
                         <tr>
                             <td class="td_title"><span>姓名</span></td>
-                            <td><input type="text" disabled name="custName" class="form-control" value="${customer.custName}"></td>
+                            <td><input type="text" disabled name="custName" class="form-control edit" value="${customer.custName}"></td>
                             <td class="td_title">职位</td>
-                            <td><input type="text" class="form-control" name="job" disabled value="${customer.job}"></td>
+                            <td><input type="text" class="form-control edit" name="job" disabled value="${customer.job}"></td>
                             <td class="td_title">联系电话</td>
-                            <td><input type="text" class="form-control" name="mobile" disabled value="${customer.mobile}"></td>
+                            <td><input type="text" class="form-control edit" name="mobile" disabled value="${customer.mobile}"></td>
                         </tr>
                         <tr>
                             <td class="td_title">所属行业</td>
                             <td>
-                                <select name="trade" class="form-control" disabled>
+                                <select name="trade" class="form-control edit" disabled>
                                     <option value="" ${customer.trade == "" ? "selected":""}></option>
                                     <c:forEach items="${tradeList}" var="trade">
                                         <option value="${trade.tradeName}" ${trade.tradeName == customer.trade ? "selected" : ""} >${trade.tradeName}</option>
@@ -82,7 +86,7 @@
                             </td>
                             <td class="td_title">客户来源</td>
                             <td>
-                                <select name="source" class="form-control" disabled>
+                                <select name="source" class="form-control edit" disabled>
                                     <option value="" ${customer.source == "" ? "selected":""}></option>
                                     <c:forEach items="${sourceList}" var="source">
                                         <option value="${source.sourceName}" ${source.sourceName == customer.source ? "selected" : ""}>${source.sourceName}</option>
@@ -92,7 +96,7 @@
                             </td>
                             <td class="td_title">级别</td>
                             <td>
-                                <select name="level" class="form-control" disabled>
+                                <select name="level" class="form-control edit" disabled>
                                     <option value="" ${customer.level == "" ? "selected":""}></option>
                                     <option value="★" ${customer.level == "★" ? "selected":""}>★</option>
                                     <option value="★★" ${customer.level == "★★" ? "selected":""}>★★</option>
@@ -104,11 +108,11 @@
                         </tr>
                         <tr>
                             <td class="td_title">地址</td>
-                            <td colspan="5"><input type="text" class="form-control" name="address" disabled value="${customer.address}"></td>
+                            <td colspan="5"><input type="text" class="form-control edit" name="address" disabled value="${customer.address}"></td>
                         </tr>
                         <tr>
                             <td class="td_title">备注</td>
-                            <td colspan="5"><input type="text" class="form-control" name="mark" disabled value="${customer.mark}"></td>
+                            <td colspan="5"><input type="text" class="form-control edit" name="mark" disabled value="${customer.mark}"></td>
                         </tr>
                     </table>
                     </form>
@@ -150,9 +154,17 @@
                     <div class="box">
                         <div class="box-header with-border">
                             <h3 class="box-title">日程安排</h3>
+                            <a id="addTaskLink" href="javascript:;" class="pull-right"><i class="fa fa-plus"></i></a>
                         </div>
                         <div class="box-body">
-
+                            <ul class="list-group">
+                                <c:forEach items="${taskList}" var="task">
+                                    <li class="list-group-item">
+                                        <a href="/task">${task.title}</a>
+                                        <span class="time pull-right"><i class="fa fa-clock-o"></i><fmt:formatDate value="${task.finishTime}"/></span>
+                                    </li>
+                                </c:forEach>
+                            </ul>
                         </div>
                     </div>
                     <div class="box">
@@ -186,7 +198,7 @@
                     <select id="userSelect" class="form-control" style="border: 1px solid #ccc">
                         <option value="">--请选择--</option>
                         <c:forEach items="${accountList}" var="account">
-                            <c:if test="${account.id != sessionScope.curr_account.id}">
+                            <c:if test="${account.id != requestScope.accountId}">
                                 <option value="${account.id}">${account.userName}(${account.mobile})</option>
                             </c:if>
                         </c:forEach>
@@ -201,12 +213,50 @@
     </div><!-- /.modal -->
     <!-- /模态框 -->
 
+    <!-- 模态框 -->
+    <div class="modal fade" id="addTaskModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="modal-title">添加计划任务</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="addTaskForm" action="/customer/new/task" method="post">
+                        <div class="form-group">
+                            <input type="hidden" name="accountId" value="${requestScope.accountId}"/>
+                            <input type="hidden" name="custId" value="${requestScope.customer.id}">
+                            <label>任务名称</label>
+                            <input type="text" name="title" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>完成日期</label>
+                            <input type="text" class="form-control finishTime" name="finishTime">
+                        </div>
+                        <div class="form-group">
+                            <label>提醒时间</label>
+                            <input type="text" class="form-control remindTime" name="remindTime">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" id="resetBtn">取消</button>
+                    <button type="button" class="btn btn-primary" id="saveTaskBtn">保存</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
 </div>
 <!-- ./wrapper -->
 
 <%@include file="../include/js.jsp"%>
 <script src="/static/plugins/validate/jquery.validate.min.js"></script>
-
+<script src="/static/plugins/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+<script src="/static/plugins/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+<script src="/static/plugins/moment/moment.js"></script>
+<script src="/static/plugins/datepicker/bootstrap-datepicker.js"></script>
+<script src="/static/plugins/datepicker/locales/bootstrap-datepicker.zh-CN.js"></script>
 <script>
 
     var customerId = ${customer.id};
@@ -246,18 +296,18 @@
 
     <!-- 编辑 -->
     $("#editCustomerBtn").click(function () {
-        $(".form-control").css("border","1px solid #ccc");
+        $(".edit").css("border","1px solid #ccc");
         $("#saveEditBtn").css("display","inline");
         $("#cancelEditBtn").css("display","inline");
-        $(".form-control").removeAttr("disabled");
+        $(".edit").removeAttr("disabled");
     });
     $("#cancelEditBtn").click(function () {
         layer.confirm("取消后将不会保修已修改的信息",function (index) {
             $("#editCustomerForm")[0].reset();
-            $(".form-control").css("border","none");
+            $(".edit").css("border","none");
             $("#saveEditBtn").css("display","none");
             $("#cancelEditBtn").css("display","none");
-            $(".form-control").attr("disabled", "disabled");
+            $(".edit").attr("disabled", "disabled");
             layer.close(index);
         })
     });
@@ -286,6 +336,62 @@
             }
         }
     });
+
+    <!-- 添加计划任务 -->
+    $("#addTaskLink").click(function () {
+        $("#addTaskModal").modal({
+            show : true,
+            backdrop : 'static'
+        });
+    });
+    $("#saveTaskBtn").click(function () {
+        $("#addTaskForm").submit();
+    });
+    $("#addTaskForm").validate({
+        errorClass : "text-danger",
+        errorElement : "span",
+        rules : {
+            title : {
+                required : true
+            },
+            finishTime : {
+                required : true
+            }
+        },
+        messages : {
+            title : {
+                required : "请输入任务内容"
+            },
+            finishTime : {
+                required : "请选择任务完成时间"
+            }
+        }
+    });
+    $("#resetBtn").click(function () {
+        $("#addTaskForm")[0].reset();
+    });
+
+    <!-- 时间框 -->
+    var picker = $('.finishTime').datepicker({
+        format: "yyyy-mm-dd",
+        language: "zh-CN",
+        autoclose: true,
+        todayHighlight: true,
+        startDate:"now()"
+    });
+    picker.on("changeDate",function (date) {
+        var today = moment().format("YYYY-MM-DD");
+        $('.remindTime').datetimepicker('setStartDate',today);
+        $('.remindTime').datetimepicker('setEndDate', date.format('yyyy-mm-dd'));
+    });
+    var timepicker = $('.remindTime').datetimepicker({
+        format: "yyyy-mm-dd hh:ii",
+        language: "zh-CN",
+        autoclose: true,
+        todayHighlight: true,
+        startDate:"now()"
+    });
+
 
 </script>
 

@@ -3,6 +3,7 @@ package com.kaishengit.crm.mapper;
 
 import com.kaishengit.crm.entity.Account;
 import com.kaishengit.crm.entity.AccountExample;
+import com.kaishengit.crm.entity.Dept;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -39,4 +40,5 @@ public interface AccountMapper {
                                      @Param("length") Integer length);
 
     Long countByDeptId(@Param("deptId") Integer deptId);
+
 }

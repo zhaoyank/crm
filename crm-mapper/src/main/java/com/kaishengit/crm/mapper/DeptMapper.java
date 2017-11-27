@@ -32,4 +32,6 @@ public interface DeptMapper {
     int updateByPrimaryKey(Dept record);
 
     List<Account> selectAccountByDeptId(@Param("deptId") Integer deptId);
+
+    List<Dept> findDeptsByAccontId(@Param("accountId") Integer accountId);
 }

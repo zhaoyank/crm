@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +40,8 @@ public class CustomerController extends BaseController {
     private AccountService accountService;
     @Autowired
     private SaleChanceService saleChanceService;
+    @Autowired
+    private TaskService taskService;
 
     @GetMapping("/my")
     public String list(Model model) {
@@ -52,15 +55,14 @@ public class CustomerController extends BaseController {
 
     @GetMapping("/list.json")
     @ResponseBody
-    public PageInfo<Customer> custList(HttpSession session,
-                                       @RequestParam(name = "p",required = false,defaultValue = "1") Integer start,
+    public PageInfo<Customer> custList(@RequestParam(name = "p",required = false,defaultValue = "1") Integer start,
                                        @RequestParam(required = false,defaultValue = "") String keys) {
 
         if("undefined".equals(keys)) {
             keys = "";
         }
 
-        Account account = getCurrentAccount(session);
+        Account account = getCurrentAccount();
         Map<String, Object> queryParam = new HashMap<>();
         queryParam.put("accountId",account.getId());
         queryParam.put("start", start);
@@ -71,8 +73,8 @@ public class CustomerController extends BaseController {
 
     @PostMapping("/new")
     @ResponseBody
-    public JsonResult newCustomer(HttpSession session,Customer customer) {
-        Account account = getCurrentAccount(session);
+    public JsonResult newCustomer(Customer customer) {
+        Account account = getCurrentAccount();
         customer.setAccountId(account.getId());
         customerService.saveNewCustomer(customer);
         return JsonResult.success();
@@ -80,30 +82,33 @@ public class CustomerController extends BaseController {
 
     @GetMapping("/my/{id:\\d+}")
     public String showMyCustomer(@PathVariable Integer id,
-                                 HttpSession session,
                                  Model model) {
+        Account account = getCurrentAccount();
+
         List<Trade> tradeList = tradeService.findAllTrade();
         List<Source> sourceList = sourceService.findAllSoure();
 
-        Customer customer = permissions(session, id);
+        Customer customer = permissions(id);
         List<Account> accountList = accountService.findAllAccount();
 
-        Integer accountId = getCurrentAccount(session).getId();
+        Integer accountId = getCurrentAccount().getId();
         List<SaleChance> saleChanceList = saleChanceService.findByAccountIdAndCustId(accountId, id);
+        List<Task> taskList = taskService.findTasByCustId(account.getId() ,id);
 
         model.addAttribute("accountList",accountList);
         model.addAttribute("customer",customer);
         model.addAttribute("tradeList",tradeList);
         model.addAttribute("sourceList",sourceList);
         model.addAttribute("saleChanceList",saleChanceList);
+        model.addAttribute("accountId", getCurrentAccount().getId());
+        model.addAttribute("taskList", taskList);
         return "customer/show";
     }
 
     @GetMapping("/my/{id:\\d+}/delete")
-    public String deleteCustomer(@PathVariable Integer id,
-                                 HttpSession session,
+    public String deleteCustomer(@PathVariable Integer id,Model model,
                                  RedirectAttributes redirectAttributes) {
-        Customer customer = permissions(session, id);
+        Customer customer = permissions(id);
         customerService.deleteCustomer(customer);
 
         redirectAttributes.addFlashAttribute("message", "客户删除成功");
@@ -112,11 +117,10 @@ public class CustomerController extends BaseController {
 
     @PostMapping("/my/{id:\\d+}")
     public String editCustomer(Customer customer,
-                               HttpSession session,
                                @PathVariable Integer id,
                                RedirectAttributes redirectAttributes) {
 
-        permissions(session, id);
+        permissions(id);
         customerService.editCustomer(customer);
         redirectAttributes.addFlashAttribute("message", "修改成功");
         return "redirect:/customer/my/" + id;
@@ -124,9 +128,8 @@ public class CustomerController extends BaseController {
 
     @GetMapping("/my/{id:\\d+}/public")
     public String publicCustomer(@PathVariable Integer id,
-                                 HttpSession session,
                                  RedirectAttributes redirectAttributes) {
-        Customer customer = permissions(session, id);
+        Customer customer = permissions(id);
         customerService.publicCustomer(customer);
         redirectAttributes.addFlashAttribute("message","将客户放入公海成功");
         return "redirect:/customer/my";
@@ -139,9 +142,8 @@ public class CustomerController extends BaseController {
     @GetMapping("/my/{customerId:\\d+}/tran/{toAccountId:\\d+}")
     public String tranCustomer(@PathVariable Integer customerId,
                                @PathVariable Integer toAccountId,
-                               HttpSession session,
                                RedirectAttributes redirectAttributes) {
-        Customer customer = permissions(session , customerId);
+        Customer customer = permissions(customerId);
         customerService.tranCustomer(customer,toAccountId);
 
         redirectAttributes.addFlashAttribute("message","客户转交成功");
@@ -159,7 +161,7 @@ public class CustomerController extends BaseController {
     @GetMapping("/tran/{id:\\d+}/my")
     public String getPublicCustomer(@PathVariable Integer id,
                                     HttpSession session) {
-        Account account = getCurrentAccount(session);
+        Account account = getCurrentAccount();
         try {
             customerService.tranCustomerToMy(id, account);
         } catch (ServiceException ex) {
@@ -174,7 +176,7 @@ public class CustomerController extends BaseController {
     @GetMapping("/my/export.csv")
     public void exportCsvData(HttpServletResponse response,
                               HttpSession session) throws IOException {
-        Account account = getCurrentAccount(session);
+        Account account = getCurrentAccount();
 
         response.setContentType("text/csv;charset=GBK");
         String fileName = new String("我的客户.csv".getBytes("UTF-8"),"ISO8859-1");
@@ -190,7 +192,7 @@ public class CustomerController extends BaseController {
     @GetMapping("/my/export.xls")
     public void exportXlsData(HttpServletResponse response,
                               HttpSession session) throws IOException {
-        Account account = getCurrentAccount(session);
+        Account account = getCurrentAccount();
 
         response.setContentType("application/vnd.ms-excel");
         String fileName = new String("我的客户.xls".getBytes("UTF-8"),"ISO8859-1");
@@ -207,10 +209,20 @@ public class CustomerController extends BaseController {
         return "customer/public";
     }
 
+    @PostMapping("/new/task")
+    public String newTask(Integer accountId,
+                          String title,
+                          String finishTime,
+                          String remindTime,
+                          Integer custId) throws ParseException {
+
+        taskService.saveNewTask(accountId,title,finishTime, remindTime, null, custId);
+        return "redirect:/customer/my/" + custId;
+    }
 
 
-    private Customer permissions(HttpSession session, Integer id) {
-        Account account = getCurrentAccount(session);
+    private Customer permissions(Integer id) {
+        Account account = getCurrentAccount();
         Customer customer = customerService.findCustomerById(id);
 
         if (customer == null) {

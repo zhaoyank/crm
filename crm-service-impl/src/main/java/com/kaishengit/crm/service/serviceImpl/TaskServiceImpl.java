@@ -181,6 +181,20 @@ public class TaskServiceImpl implements TaskService {
     }
 
     /**
+     * 根据顾客Id查询所有计划任务
+     * @param accountId
+     * @param custId
+     * @return
+     */
+    @Override
+    public List<Task> findTasByCustId(Integer accountId, Integer custId) {
+        TaskExample taskExample = new TaskExample();
+        taskExample.createCriteria().andAccountIdEqualTo(accountId)
+                .andCustIdEqualTo(custId);
+        return taskMapper.selectByExample(taskExample);
+    }
+
+    /**
      * 根据taskId删除定时任务
      * @param id
      */

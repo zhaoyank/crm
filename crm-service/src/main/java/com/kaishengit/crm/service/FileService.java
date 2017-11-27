@@ -56,6 +56,26 @@ public interface FileService {
      * @param saveName
      * @param fileName
      * @param fileSize
+     * @param password
      */
-    void uploadFileToDB(Integer pId, Integer accountId, String saveName, String fileName, Long fileSize);
+    void uploadFileToDB(Integer pId, Integer accountId, String saveName, String fileName, Long fileSize, String password);
+
+    /**
+     * 验证文件密码
+     * @param id
+     * @param password
+     */
+    void validatePassword(Integer id, String password);
+
+    /**
+     * 更新
+     * @param file
+     */
+    void updateFileById(File file);
+
+    /**
+     * 根据Id删除文件
+     * @param id
+     */
+    void deleteById(Integer id);
 }

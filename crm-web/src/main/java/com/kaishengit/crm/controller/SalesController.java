@@ -41,7 +41,7 @@ public class SalesController extends BaseController {
 
     @GetMapping("/my")
     public String mySales(Model model, HttpSession session) {
-        Account account = getCurrentAccount(session);
+        Account account = getCurrentAccount();
         List<SaleChance> saleChanceList = saleChanceService.findAllMyChange(account.getId());
         List<Customer> customerList = customerService.findAllCustomerByAccountId(account.getId());
 
@@ -54,7 +54,7 @@ public class SalesController extends BaseController {
     public String saveChance(SaleChance saleChance,
                              HttpSession session,
                              RedirectAttributes redirectAttributes) {
-        Account account = getCurrentAccount(session);
+        Account account = getCurrentAccount();
         saleChanceService.saveNewChance(saleChance,account);
         redirectAttributes.addFlashAttribute("message","添加成功");
         return "redirect:/sales/my";
@@ -64,8 +64,8 @@ public class SalesController extends BaseController {
     public String showChance(@PathVariable Integer saleChanceId,
                              HttpSession session,
                              Model model) {
-        Account account = getCurrentAccount(session);
-        SaleChance saleChance = permissions(session , saleChanceId);
+        Account account = getCurrentAccount();
+        SaleChance saleChance = permissions(saleChanceId);
 
         Customer customer = customerService.findCustomerById(saleChance.getCustId());
         List<SaleChanceProgress> progressList = saleChanceProgressService.findProgressBySaleId(saleChanceId);
@@ -75,15 +75,15 @@ public class SalesController extends BaseController {
         model.addAttribute("customer", customer);
         model.addAttribute("progressList",progressList);
         model.addAttribute("taskList", taskList);
+        model.addAttribute("accountId", account.getId());
         return "record/show";
     }
 
     @PostMapping("/my/new/record")
     public String newChanceProgress(SaleChanceProgress saleChanceProgress,
                                     HttpSession session) {
-        permissions(session , saleChanceProgress.getSaleId());
+        permissions(saleChanceProgress.getSaleId());
         saleChanceProgressService.saveNewProgress(saleChanceProgress);
-        System.out.println(saleChanceProgress.getSaleId());
         return "redirect:/sales/my/" + saleChanceProgress.getSaleId();
     }
 
@@ -91,7 +91,7 @@ public class SalesController extends BaseController {
     public String changeSaleChanceProgress(@PathVariable Integer id,
                                            String progress,
                                            HttpSession session) {
-        SaleChance saleChance = permissions(session, id);
+        SaleChance saleChance = permissions(id);
         saleChanceService.updateSaleChanceProgress(saleChance, progress);
         return "redirect:/sales/my/" + id;
     }
@@ -99,7 +99,7 @@ public class SalesController extends BaseController {
     @GetMapping("/my/{id:\\d+}/delete")
     public String deleteSaleChance(@PathVariable Integer id,
                                    HttpSession session) {
-        permissions(session , id);
+        permissions(id);
         saleChanceService.deleteSalesChanceById(id);
         return "redirect:/sales/my";
     }
@@ -117,12 +117,11 @@ public class SalesController extends BaseController {
 
     /**
      * 判断客户是否存在 && 判断用户权限
-     * @param session
      * @param id
      * @return
      */
-    private SaleChance permissions(HttpSession session, Integer id) {
-        Account account = getCurrentAccount(session);
+    private SaleChance permissions(Integer id) {
+        Account account = getCurrentAccount();
         SaleChance saleChance = saleChanceService.findSaleChanceById(id);
 
         if (saleChance == null) {

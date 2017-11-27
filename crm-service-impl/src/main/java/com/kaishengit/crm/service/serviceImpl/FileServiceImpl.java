@@ -6,6 +6,7 @@ import com.kaishengit.crm.file.FileStore;
 import com.kaishengit.crm.mapper.FileMapper;
 import com.kaishengit.crm.service.FileService;
 import com.kaishengit.crm.service.exception.ServiceException;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -138,9 +139,10 @@ public class FileServiceImpl implements FileService {
      * @param saveName
      * @param fileName
      * @param fileSize
+     * @param password
      */
     @Override
-    public void uploadFileToDB(Integer pId, Integer accountId, String saveName, String fileName, Long fileSize) {
+    public void uploadFileToDB(Integer pId, Integer accountId, String saveName, String fileName, Long fileSize, String password) {
         File file = new File();
         file.setType(File.FILE_TYPE_FILE);
         file.setDownloadCount(0);
@@ -150,7 +152,60 @@ public class FileServiceImpl implements FileService {
         file.setFileName(fileName);
         file.setFileSize(FileUtils.byteCountToDisplaySize(fileSize));
         file.setSaveName(saveName);
+        file.setPassword(password);
 
         fileMapper.insertSelective(file);
+    }
+
+    /**
+     * 验证文件密码
+     * @param id
+     * @param password
+     */
+    @Override
+    public void validatePassword(Integer id, String password) {
+        password = DigestUtils.md5Hex(password);
+        File file = fileMapper.selectByPrimaryKey(id);
+
+        if(file == null)  {
+            throw new ServiceException("文件不存在或已被删除");
+        }
+        if (!password.equals(file.getPassword())) {
+            throw new ServiceException("密码错误");
+        }
+    }
+
+    /**
+     * 更新
+     *
+     * @param file
+     */
+    @Override
+    public void updateFileById(File file) {
+        FileExample fileExample = new FileExample();
+        fileExample.createCriteria()
+                .andFileNameEqualTo(file.getFileName())
+                .andPIdEqualTo(file.getpId());
+        List<File> fileList = fileMapper.selectByExample(fileExample);
+
+        if (fileList.isEmpty()) {
+            fileMapper.updateByPrimaryKeySelective(file);
+        } else {
+            throw new ServiceException("文件名重复");
+        }
+
+    }
+
+    /**
+     * 根据Id删除文件
+     * @param id
+     */
+    @Override
+    public void deleteById(Integer id) {
+        List<File> fileList = findFileListByPId(id);
+        if (fileList != null && !fileList.isEmpty()) {
+            throw new ServiceException("请删除文件夹中的文件后在删除文件夹");
+        }
+        fileMapper.deleteByPrimaryKey(id);
     }
 }

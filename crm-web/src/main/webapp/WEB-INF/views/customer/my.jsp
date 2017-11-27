@@ -254,7 +254,12 @@
         var getCustomerList = function () {
             $("#custTable").html("");
             $.get("/customer/list.json",{"_":(new Date()).valueOf(),"keys": keys}).done(function (data) {
-                showRow(data.list);
+                if (data.list.length == 0) {
+                    var html = '<tr><td></td><td colspan="5"><span>暂无客户,请点击 <a href="javascript:;" id="addCustomerLink">新增客户</a>添加一位客户</span></td></tr>';
+                    $("#custTable").append(html);
+                } else {
+                    showRow(data.list);
+                }
             }).error(function () {
                 layer.msg("系统异常,请稍候再试")
             });
@@ -264,6 +269,12 @@
         getCustomerList();
 
         <!-- 新增客户 -->
+        $(document).delegate("#addCustomerLink","click",function () {
+            $("#addCustomerModal").modal({
+                show: true,
+                backdrop: 'static'
+            });
+        });
         $("#addCustomerBtn").click(function () {
             $("#addCustomerModal").modal({
                 show: true,
